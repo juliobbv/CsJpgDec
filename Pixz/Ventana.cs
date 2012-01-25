@@ -32,7 +32,7 @@ namespace PixzGui
                     Stopwatch watch = new Stopwatch();
 
                     watch.Start();
-                    if (Path.GetExtension(dialogo.FileName) == ".jpg")
+                    if (Path.GetExtension(dialogo.FileName).ToLower() == ".jpg")
                         imgO = Pixz.Decode(dialogo.FileName, (EncodeType)0);
                     else
                         imgO = new Bitmap(dialogo.FileName);

@@ -7,7 +7,8 @@ using System.IO;
 namespace LibPixz
 {
     /// <summary>
-    /// Extensions for BinaryReader that enable reading big endian numbers
+    /// Extensions for BinaryReader that enable reading big endian numbers,
+    /// or numbers without markers
     /// </summary>
     public static class BinaryReaderEx
     {

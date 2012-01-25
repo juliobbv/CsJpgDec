@@ -1,8 +1,10 @@
 ﻿Bugs:
 
-Quantizers
-Better chroma upscaling
+Quantizers are acting up
+Better chroma upscaling - Bilinear or something
 Fix tacky code
+Better handling of markers (Restart, etc.)
+Fix parser code - don't misdetect thumbnails as images
 
 BitReader design will 'eat' EOI marker
 
