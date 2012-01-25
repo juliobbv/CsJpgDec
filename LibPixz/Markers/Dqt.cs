@@ -30,6 +30,10 @@ namespace LibPixz.Markers
 
         public static int ReadTable(BinaryReader reader, ImgInfo imgInfo)
         {
+            Logger.WriteLine("---DQT---");
+            Logger.WriteLine("Found at: " + reader.BaseStream.Position.ToString("X"));
+            Logger.WriteLine();
+
             byte tableInfo = reader.ReadByte();
             byte tableId = (byte)(tableInfo & 0xf); // Low 4 bits of tableInfo
 
@@ -69,12 +73,11 @@ namespace LibPixz.Markers
 
         static void Log(BinaryReader reader, QuantTable quantTable)
         {
-            Console.WriteLine("---DQT table---");
-            Console.WriteLine("ID: " + quantTable.id);
-            Console.WriteLine("Precision: " + quantTable.precision);
-            Console.WriteLine("The table itself");
+            Logger.WriteLine("Table ID: " + quantTable.id);
+            Logger.WriteLine("Precision: " + quantTable.precision);
+            Logger.WriteLine("The table itself");
             Common.PrintTable(quantTable.table, 8, 8, 4);
-            Console.WriteLine();
+            Logger.WriteLine();
         }
     }
 }

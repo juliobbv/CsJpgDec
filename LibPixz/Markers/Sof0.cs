@@ -19,6 +19,10 @@ namespace LibPixz.Markers
     {
         public static void Read(BinaryReader reader, ImgInfo imgInfo)
         {
+            Logger.WriteLine("---SOF0---");
+            Logger.WriteLine("Found at: " + reader.BaseStream.Position.ToString("X"));
+            Logger.WriteLine();
+
             imgInfo.length = reader.ReadBEUInt16();
             imgInfo.dataPrecision = reader.ReadByte();
             imgInfo.height = reader.ReadBEUInt16();
@@ -53,6 +57,27 @@ namespace LibPixz.Markers
 
                 imgInfo.components[id].quantTableId = reader.ReadByte();
             }
+
+            Log(reader, imgInfo);
+        }
+
+        static void Log(BinaryReader reader, ImgInfo imgInfo)
+        {
+            Logger.WriteLine("Length: " + imgInfo.length);
+            Logger.WriteLine("Width: " + imgInfo.width + " Height: " + imgInfo.height);
+
+            Logger.WriteLine("Number of components: " + imgInfo.numOfComponents);
+            Logger.WriteLine("Data precision: " + imgInfo.dataPrecision);
+            Logger.WriteLine();
+
+            for (int i = 0; i < imgInfo.numOfComponents; i++)
+            {
+                Logger.WriteLine("Component " + i);
+                Logger.WriteLine("Sampling Factor X: " + imgInfo.components[i].samplingFactorX);
+                Logger.WriteLine("Sampling Factor Y: " + imgInfo.components[i].samplingFactorY);
+            }
+
+            Logger.WriteLine();
         }
     }
 }

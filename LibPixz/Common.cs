@@ -56,10 +56,10 @@ namespace LibPixz
             {
                 for (int i = 0; i < width; i++)
                 {
-                    Console.Write(String.Format("{0," + margin + "}", array.GetValue(j * height + i))  + " ");
+                    Logger.Write(String.Format("{0," + margin + "}", array.GetValue(j * height + i))  + " ");
                 }
 
-                Console.WriteLine();
+                Logger.WriteLine();
             }
         }
 
@@ -74,22 +74,22 @@ namespace LibPixz
             {
                 for (int i = 0; i < width; i++)
                 {
-                    Console.Write(String.Format("{0," + margin + "}", array.GetValue(j,  i)) + " ");
+                    Logger.Write(String.Format("{0," + margin + "}", array.GetValue(j,  i)) + " ");
                 }
 
-                Console.WriteLine();
+                Logger.WriteLine();
             }
         }
 
         protected internal static void PrintHuffmanTable(List<Huffman.CodeInfo> table)
         {
-            Console.WriteLine("       Code        Number     Length");
+            Logger.WriteLine("       Code        Number     Length");
 
             foreach (var entry in table)
             {
-                Console.Write(FormatString(ToBinary(entry), 16));
-                Console.Write(FormatString(entry.number, 8));
-                Console.WriteLine(FormatString(entry.length, 8));
+                Logger.Write(FormatString(ToBinary(entry), 16));
+                Logger.Write(FormatString(entry.number, 8));
+                Logger.WriteLine(FormatString(entry.length, 8));
             }
         }
 

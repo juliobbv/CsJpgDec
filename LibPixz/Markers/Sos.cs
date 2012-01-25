@@ -11,6 +11,10 @@ namespace LibPixz.Markers
     {
         public static Bitmap Read(BinaryReader reader, ImgInfo imgInfo)
         {
+            Logger.WriteLine("---SOS---");
+            Logger.WriteLine("Found at: " + reader.BaseStream.Position.ToString("X"));
+            Logger.WriteLine();
+
             if (imgInfo.numOfComponents != 3)
                 throw new Exception("Unsupported format");
 

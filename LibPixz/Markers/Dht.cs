@@ -34,6 +34,10 @@ namespace LibPixz.Markers
 
         public static int ReadTable(BinaryReader reader, ImgInfo imgInfo)
         {
+            Logger.WriteLine("---DHT---");
+            Logger.WriteLine("Found at: " + reader.BaseStream.Position.ToString("X"));
+            Logger.WriteLine();
+
             byte tableInfo = reader.ReadByte();
             byte tableId = (byte)(tableInfo & 0x7); // Low 3 bits of tableInfo
             int numCodes = 0;
@@ -75,15 +79,13 @@ namespace LibPixz.Markers
 
         static void Log(BinaryReader reader, HuffmanTable huffmanTable)
         {
-            Console.WriteLine("---DHT table---");
-            Console.WriteLine("ID: " + huffmanTable.id);
-            Console.WriteLine("Type: " + huffmanTable.type);
-            Console.WriteLine("Max code length: " + huffmanTable.maxCodeLength);
-            Console.WriteLine("The table itself");
+            Logger.WriteLine("Table ID: " + huffmanTable.id);
+            Logger.WriteLine("Type: " + huffmanTable.type);
+            Logger.WriteLine("Max code length: " + huffmanTable.maxCodeLength);
+            Logger.WriteLine("The table itself");
             Common.PrintHuffmanTable(huffmanTable.table);
-            Console.WriteLine("Total: " + huffmanTable.table.Count);
-            //Common.PrintTable(quantTable.table, 8, 8, 4);
-            Console.WriteLine();
+            Logger.WriteLine("Total: " + huffmanTable.table.Count);
+            Logger.WriteLine();
         }
     }
 }
