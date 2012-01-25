@@ -48,8 +48,6 @@ namespace LibPixz
                                     6
                                   };
 
-        static float[] sqrt = { 0, 1, 1.4142125F, 1, 2 };
-
         protected static float[,] GetTablaCos(int tam)
         {
             float[,] tablaCosXU = new float[tam, tam];
@@ -324,15 +322,22 @@ namespace LibPixz
                 coefDct[tam - 1, x] = 96f;
         }
 
-        protected internal static float[,] ScaleCoefs(float[,] coefDct, int tamX, int tamY, int scaleX, int scaleY)
+        protected internal static float[,] BilinearResize(float[,] img, int width, int height, int scaleX, int scaleY)
         {
-            float[,] output = new float[tamX * scaleX, tamY * scaleY];
+            float[,] output = new float[height * scaleY, width * scaleX];
 
-            for (int j = 0, y = 0; j < tamY * scaleY; j += scaleY, y++)
+            // For staircase FTW
+            for (int j = 0; j < height; j++)
             {
-                for (int i = 0, x = 0; i < tamX * scaleX; i += scaleX, x++)
+                for (int i = 0; i < width; i++)
                 {
-                    output[j, i] = coefDct[y, x] * sqrt[scaleX * scaleY];
+                    for (int jj = 0; jj < scaleY; jj++)
+                    {
+                        for (int ii = 0; ii < scaleX; ii++)
+                        {
+                            output[j * scaleY + jj, i * scaleX + ii] = img[j, i];
+                        }
+                    }
                 }
             }
 

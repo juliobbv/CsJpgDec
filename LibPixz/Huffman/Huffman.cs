@@ -1,20 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using PriorityQueue;
 using LibPixz.Markers;
 
 namespace LibPixz
 {
     public class Huffman
     {
-        public class TreeNode<T>
-        {
-            public T item;
-            public TreeNode<T> left;
-            public TreeNode<T> right;
-        }
-
         public struct CodeInfo
         {
             public ushort number;
@@ -146,30 +138,6 @@ namespace LibPixz
             }
 
             return numStr;
-        }
-
-        static int BlechComparator(CodeInfo x, CodeInfo y)
-        {
-            if (x.length > y.length)
-            {
-                return 1;
-            }
-            else if (x.length < y.length)
-            {
-                return -1;
-            }
-            else if (x.number > y.number)
-            {
-                return 1;
-            }
-            else if (x.number < y.number)
-            {
-                return -1;
-            }
-            else
-            {
-                return 0;
-            }
         }
 
         int[] Test()

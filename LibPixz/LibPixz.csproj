@@ -49,7 +49,7 @@
     <Compile Include="Common.cs" />
     <Compile Include="Huffman\BitReader.cs" />
     <Compile Include="Huffman\Huffman.cs" />
-    <Compile Include="Huffman\PriorityQueue.cs" />
+    <Compile Include="Markers\ImageDecoder.cs" />
     <Compile Include="Markers\ImgInfo.cs" />
     <Compile Include="ImgOps.cs" />
     <Compile Include="Markers\Dht.cs" />
