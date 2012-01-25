@@ -68,7 +68,22 @@ namespace LibPixz.Markers
 
             imgInfo.huffmanTables[huffmanTable.type, huffmanTable.id] = huffmanTable;
 
+            Log(reader, huffmanTable);
+
             return 1 + 16 + numCodes;
+        }
+
+        static void Log(BinaryReader reader, HuffmanTable huffmanTable)
+        {
+            Console.WriteLine("---DHT table---");
+            Console.WriteLine("ID: " + huffmanTable.id);
+            Console.WriteLine("Type: " + huffmanTable.type);
+            Console.WriteLine("Max code length: " + huffmanTable.maxCodeLength);
+            Console.WriteLine("The table itself");
+            Common.PrintHuffmanTable(huffmanTable.table);
+            Console.WriteLine("Total: " + huffmanTable.table.Count);
+            //Common.PrintTable(quantTable.table, 8, 8, 4);
+            Console.WriteLine();
         }
     }
 }

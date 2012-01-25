@@ -112,34 +112,6 @@ namespace LibPixz
             }
         }
 
-        static void PrintTable(List<CodeInfo> result)
-        {
-#if DEBUG
-            for (int i = 0; i < result.Count; i++)
-            {
-                CodeInfo val = result[i];
-
-                Console.WriteLine((char)val.number + "\t" + val.number + "\t" + ToBinary(val));
-            }
-
-            Console.WriteLine();
-#endif
-        }
-
-        static string ToBinary(CodeInfo number)
-        {
-            string numStr = string.Empty;
-
-            while (number.length > 0)
-            {
-                numStr = (number.code & 1) + numStr;
-                number.code >>= 1;
-                number.length--;
-            }
-
-            return numStr;
-        }
-
         int[] Test()
         {
             int size = 32;

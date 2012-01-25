@@ -47,5 +47,75 @@ namespace LibPixz
 
             return blTrns;
         }
+
+        protected internal static void PrintTable(Array array, int width, int height, int margin)
+        {
+            if (array.Rank != 1) return;
+
+            for (int j = 0; j < height; j++)
+            {
+                for (int i = 0; i < width; i++)
+                {
+                    Console.Write(String.Format("{0," + margin + "}", array.GetValue(j * height + i))  + " ");
+                }
+
+                Console.WriteLine();
+            }
+        }
+
+        protected internal static void PrintTable(Array array, int margin)
+        {
+            if (array.Rank != 2) return;
+
+            int width = array.GetLength(0);
+            int height = array.GetLength(1);
+
+            for (int j = 0; j < height; j++)
+            {
+                for (int i = 0; i < width; i++)
+                {
+                    Console.Write(String.Format("{0," + margin + "}", array.GetValue(j,  i)) + " ");
+                }
+
+                Console.WriteLine();
+            }
+        }
+
+        protected internal static void PrintHuffmanTable(List<Huffman.CodeInfo> table)
+        {
+            Console.WriteLine("       Code        Number     Length");
+
+            foreach (var entry in table)
+            {
+                Console.Write(FormatString(ToBinary(entry), 16));
+                Console.Write(FormatString(entry.number, 8));
+                Console.WriteLine(FormatString(entry.length, 8));
+            }
+        }
+
+        protected internal static string FormatString(string label, object value, int margin)
+        {
+            return label + ": " + String.Format("{0," + margin + "}", value.ToString()) + " ";
+        }
+
+        protected internal static string FormatString(object value, int margin)
+        {
+            return String.Format("{0," + margin + "}", value.ToString()) + " ";
+        }
+
+        static string ToBinary(Huffman.CodeInfo number)
+        {
+            string numStr = string.Empty;
+
+            while (number.length > 0)
+            {
+                numStr = (number.code & 1) + numStr;
+                number.code >>= 1;
+                number.length--;
+            }
+
+            return numStr;
+        }
+
     }
 }

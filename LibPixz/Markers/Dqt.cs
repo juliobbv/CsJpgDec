@@ -62,7 +62,19 @@ namespace LibPixz.Markers
 
             imgInfo.quantTables[tableId] = quantTable;
 
+            Log(reader, quantTable);
+
             return 1 + 64 * sizeOfElement;
+        }
+
+        static void Log(BinaryReader reader, QuantTable quantTable)
+        {
+            Console.WriteLine("---DQT table---");
+            Console.WriteLine("ID: " + quantTable.id);
+            Console.WriteLine("Precision: " + quantTable.precision);
+            Console.WriteLine("The table itself");
+            Common.PrintTable(quantTable.table, 8, 8, 4);
+            Console.WriteLine();
         }
     }
 }
