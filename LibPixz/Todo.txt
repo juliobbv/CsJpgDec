@@ -1,8 +1,9 @@
 ﻿Bugs:
 
 Quantizers
-The last MCUs won't sometimes be decoded due to huffman decoding design
 Better chroma upscaling
 Fix tacky code
+
+BitReader design will 'eat' EOI marker
 
 And more :)

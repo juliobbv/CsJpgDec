@@ -10,8 +10,8 @@ namespace LibPixz
     {
         const uint dataSize = sizeof(ushort) * 8;
         BinaryReader reader;
-        ushort readData;
-        uint remainingBits;
+        uint readData;
+        uint availableBits;
 
         /// <summary>
         /// How many bits we read at once in the stream
@@ -23,57 +23,54 @@ namespace LibPixz
 
         public BitReader(BinaryReader reader)
         {
-            remainingBits = dataSize;
+            availableBits = 0;
+            readData = 0;
             this.reader = reader;
-            readData = reader.ReadBEUInt16NonStuffed();
+        }
+
+        public ushort Peek(uint length)
+        {
+            if (length > dataSize) throw new Exception("Reading too many bits");
+
+            // If we don't have as many bits as needed, read another chunk from stream
+            if (length > availableBits)
+            {
+                availableBits += dataSize;
+
+                ushort nextChunk = 0;
+
+                try
+                {
+                    nextChunk = reader.ReadBEUInt16NonStuffed();
+                }
+                // If already at the end of stream, next chunk will be all zeros,
+                // so we can decode the last blocks of the image
+                catch (Exception) { }
+
+                readData = (readData << 16) | nextChunk;
+            }
+
+            // We move data left and right in order to get only the bits we require
+            uint cleanData = readData << (int)(dataSize * 2 - availableBits);
+            cleanData >>= (int)(dataSize * 2 - length);
+
+            return (ushort)cleanData;
         }
 
         public ushort Read(uint length)
         {
-            ushort data = 0;
-
             if (length > dataSize) throw new Exception("Reading too many bits");
 
-            try
-            {
-                // If the data is in two integers, then we get the first
-                // part of the data, then move it to its correct position
-                // and finally combine it with the second part
-                if (length > remainingBits)
-                {
-                    uint splitOffset = length - remainingBits;
+            ushort data = Peek(length);
 
-                    length -= remainingBits;
+            availableBits -= length;
 
-                    data = Read(remainingBits);
+            int shift = (int)(dataSize * 2 - availableBits);
+            // We move data left and right in order to get only the bits we require
+            readData <<= shift;
+            readData >>= shift;
 
-                    // Data is already clean, so we only put it in the right place
-                    data <<= (int)splitOffset;
-                }
-
-                // In this part, we attempt to move the data to the left
-                // edge, then to the right, in order to clean it from
-                // adjacent data
-                uint offsetLeft = dataSize - remainingBits;
-                uint offsetRight = dataSize - length;
-
-                ushort dataLeft = (ushort)(readData << (int)offsetLeft);
-                data |= (ushort)(dataLeft >> (int)offsetRight);
-
-                remainingBits -= length;
-
-                if (remainingBits == 0)
-                {
-                    remainingBits = dataSize;
-                    readData = reader.ReadBEUInt16NonStuffed();
-                }
-
-                return data;
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            return data;
         }
 
         public BinaryReader GetBinaryReader()

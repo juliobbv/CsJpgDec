@@ -42,10 +42,6 @@ namespace LibPixz.Markers
 
             BitReader bReader = new BitReader(reader);
 
-            // ToDo: quitar esto
-            Huffman.data = 0;
-            Huffman.lenToRead = bReader.BitStride;
-
             try
             {
                 // My daily WTF

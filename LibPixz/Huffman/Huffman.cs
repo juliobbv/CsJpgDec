@@ -8,9 +8,6 @@ namespace LibPixz
 {
     public class Huffman
     {
-        public static ushort data;
-        public static uint lenToRead;
-
         public class TreeNode<T>
         {
             public T item;
@@ -40,15 +37,10 @@ namespace LibPixz
 
         public static ushort ReadRunAmplitude(BitReader bReader, HuffmanTable table)
         {
-            ushort readData = bReader.Read(lenToRead);
-
-            data |= readData;
-            
-            var code = data >> ((int)bReader.BitStride - table.maxCodeLength);
+            ushort code = bReader.Peek(table.maxCodeLength);
             CodeInfo currentCode = table.preIndexTable[code];
 
-            lenToRead = currentCode.length;
-            data <<= (int)lenToRead;
+            bReader.Read(currentCode.length);
 
             return currentCode.number;
         }
@@ -56,16 +48,9 @@ namespace LibPixz
         public static short ReadCoefValue(BitReader bReader, uint size)
         {
             if (size == 0) return 0;
-            ushort readData = bReader.Read(lenToRead);
+            ushort specialBits = bReader.Read(size);
 
-            data |= readData;
-
-            ushort abs = (ushort)(data >> (int)(bReader.BitStride - size));
-            data <<= (int)size;
-
-            lenToRead = size;
-
-            return SpecialBitsToValue(abs, (short)size);
+            return SpecialBitsToValue(specialBits, (short)size);
         }
 
         public static short SpecialBitsToValue(ushort number, short size)
