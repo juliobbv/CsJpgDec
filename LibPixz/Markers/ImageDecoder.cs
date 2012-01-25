@@ -169,7 +169,7 @@ namespace LibPixz.Markers
             float[,] imgP = ImgOps.Dct(coefDct, blkSize, blkSize, true);
 
             if (scaleX != 1 && scaleY != 1)
-                imgP = ImgOps.BilinearResize(imgP, blkSize, blkSize, scaleX, scaleY);
+                imgP = ImgOps.NearestNeighborResize(imgP, blkSize, blkSize, scaleX, scaleY);
 
             ComponerBloque(imgInfo, img, imgP, blkSize * scaleX, blkSize * scaleY, ofsX, ofsY);
         }

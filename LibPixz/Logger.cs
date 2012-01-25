@@ -8,7 +8,7 @@ namespace LibPixz
 {
     public class Logger
     {
-        static StreamWriter writer = new StreamWriter("pixzLog.txt");
+        static StreamWriter writer = new StreamWriter("pixzLog.txt", true);
 
         protected internal static void WriteLine()
         {
@@ -23,6 +23,11 @@ namespace LibPixz
         protected internal static void Write(string value)
         {
             writer.Write(value);
+        }
+
+        protected internal static void Flush()
+        {
+            writer.Flush();
         }
     }
 }

@@ -49,18 +49,20 @@ namespace LibPixz.Markers
 
             int sizeOfElement = quantTable.precision == 0 ? 1: 2;
 
+            var tabla = FileOps.tablasZigzag[8];
+
             if (quantTable.precision == 0)
             {
                 for (int i = 0; i < 64; i++)
                 {
-                    quantTable.table[i] = reader.ReadByte();
+                    quantTable.table[tabla[i].Y * 8 + tabla[i].X] = reader.ReadByte();
                 }
             }
             else
             {
                 for (int i = 0; i < 64; i++)
                 {
-                    quantTable.table[i] = reader.ReadBEUInt16();
+                    quantTable.table[tabla[i].Y * 8 + tabla[i].X] = reader.ReadBEUInt16();
                 }
             }
 

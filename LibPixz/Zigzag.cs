@@ -58,10 +58,9 @@ namespace LibPixz
             int numElem = tam * tam;
             short[] coefZig = new short[numElem];
 
-            // Dejamos un espacio para los parámetros del cuadro
             for (int i = 0; i < numElem; i++)
             {
-                coefZig[i + 1] = coefDct[orden[i].Y, orden[i].X];
+                coefZig[i] = coefDct[orden[i].Y, orden[i].X];
             }
 
             return coefZig;

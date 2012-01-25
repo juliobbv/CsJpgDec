@@ -79,6 +79,7 @@ namespace LibPixz
             catch (Exception) { }
 
             reader.Close();
+            Logger.Flush();
 
             //bmp.Save("C:\\progress1.png");
             return bmp;

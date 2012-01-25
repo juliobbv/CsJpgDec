@@ -322,7 +322,7 @@ namespace LibPixz
                 coefDct[tam - 1, x] = 96f;
         }
 
-        protected internal static float[,] BilinearResize(float[,] img, int width, int height, int scaleX, int scaleY)
+        protected internal static float[,] NearestNeighborResize(float[,] img, int width, int height, int scaleX, int scaleY)
         {
             float[,] output = new float[height * scaleY, width * scaleX];
 
