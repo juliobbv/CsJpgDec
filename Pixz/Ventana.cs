@@ -12,7 +12,7 @@ namespace PixzGui
 {
     public partial class Ventana : Form
     {
-        Bitmap imgO;
+        List<Bitmap> images;
 
         public Ventana()
         {
@@ -27,21 +27,23 @@ namespace PixzGui
             {
                 if (dialogo.ShowDialog() == DialogResult.OK)
                 {
-                    if (imgO != null) imgO.Dispose();
+                    //if (imgO != null) imgO.Dispose();
 
                     Stopwatch watch = new Stopwatch();
 
-                    watch.Start();
                     if (Path.GetExtension(dialogo.FileName).ToLower() == ".jpg")
-                        imgO = Pixz.Decode(dialogo.FileName, (EncodeType)0);
-                    else
-                        imgO = new Bitmap(dialogo.FileName);
+                    {
+                        watch.Start();
+                        images = Pixz.Decode(dialogo.FileName);
+                        watch.Stop();
 
-                    watch.Stop();
-                    lblTiempo.Text = watch.ElapsedMilliseconds / 1000.0 + " s";
+                        lblTiempo.Text = watch.ElapsedMilliseconds / 1000.0 + " s";
+                        pbxOriginal.Image = images[0];
 
-                    pbxOriginal.Image = imgO;
-                    pbxOriginal.BackgroundImage = imgO;
+                        nudImagen.Value = 0;
+                        nudImagen.Minimum = 0;
+                        nudImagen.Maximum = images.Count - 1;
+                    }
                 }
             }
             //}
@@ -50,29 +52,20 @@ namespace PixzGui
             //    MessageBox.Show("Ocurrió un error al abrir al archivo\n" + ex.Message);
             //}
         }
-        
-
-        private void ImprimirMatriz(ListBox lbxMatriz, float[,] matriz)
-        {
-            lbxMatriz.Items.Clear();
-
-            for (int j = 0; j < matriz.GetLength(0); j++)
-            {
-                string renglon = string.Empty;
-
-                for (int i = 0; i < matriz.GetLength(1); i++)
-                {
-                    renglon += String.Format("{0,3}", matriz[j,i])  + " ";
-                }
-
-                lbxMatriz.Items.Add(renglon);
-            }
-        }
 
         private void pbxOriginal_BackgroundImageChanged(object sender, EventArgs e)
         {
             pbxOriginal.Width = pbxOriginal.Image.Width;
             pbxOriginal.Height = pbxOriginal.Image.Height;
+        }
+
+        private void nudImagen_ValueChanged(object sender, EventArgs e)
+        {
+            if (images == null) return;
+
+            int value = (int)(sender as NumericUpDown).Value;
+
+            pbxOriginal.Image = images[value];
         }
     }
 }

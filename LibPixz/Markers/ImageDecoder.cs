@@ -170,7 +170,7 @@ namespace LibPixz.Markers
             int quantIndex = imgInfo.components[compIndex].quantTableId;
 
             short[] coefZig = ObtenerCoef(bReader, imgInfo, compIndex, blkSize * blkSize, ref deltaDc);
-            short[,] coefDctB = FileOps.ComponerZigZag(coefZig, FileOps.tablasZigzag[blkSize], blkSize);
+            short[,] coefDctB = FileOps.ZigZagToArray(coefZig, FileOps.tablasZigzag[blkSize], blkSize);
             float[,] coefDct = ImgOps.Dequant(coefDctB, imgInfo.quantTables[quantIndex].table, blkSize);
             float[,] imgP = ImgOps.Dct(coefDct, blkSize, blkSize, true);
 

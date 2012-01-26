@@ -10,70 +10,70 @@ namespace LibPixz
     {
         protected internal static Dictionary<int, Point[]> tablasZigzag = new Dictionary<int, Point[]>()
         {
-            { 8, FileOps.GetTablaZigzag(8, 8) },
-            { 16, FileOps.GetTablaZigzag(16, 16) },
-            { 32, FileOps.GetTablaZigzag(32, 32) },
-            { 64, FileOps.GetTablaZigzag(64, 64) }
+            { 8, FileOps.GetZigzagTable(8, 8) },
+            { 16, FileOps.GetZigzagTable(16, 16) },
+            { 32, FileOps.GetZigzagTable(32, 32) },
+            { 64, FileOps.GetZigzagTable(64, 64) }
         };
 
-        protected internal static Point[] GetTablaZigzag(int tamX, int tamY)
+        protected internal static Point[] GetZigzagTable(int width, int height)
         {
-            if (tamX <= 0 || tamY <= 0)
-                throw new Exception("Las dimensiones del bloque no pueden ser 0 ni negativas");
+            if (width <= 0 || height <= 0)
+                throw new Exception("Block dimensions can't be less than zero");
 
-            Point[] tabla = new Point[tamY * tamX];
+            Point[] tabla = new Point[height * width];
             int x = 0, y = 0;
             int pos = 0;
 
             tabla[pos++] = new Point(x, y);
 
-            while (pos < tamY * tamX)
+            while (pos < height * width)
             {
-                if (x == tamX - 1)
+                if (x == width - 1)
                     tabla[pos++] = new Point(x, ++y);
                 else
                     tabla[pos++] = new Point(++x, y);
 
-                if (pos == tamY * tamX) break;
+                if (pos == height * width) break;
 
-                while (x > 0 && y < tamY - 1)
+                while (x > 0 && y < height - 1)
                     tabla[pos++] = new Point(--x, ++y);
 
-                if (y == tamY - 1)
+                if (y == height - 1)
                     tabla[pos++] = new Point(++x, y);
                 else
                     tabla[pos++] = new Point(x, ++y);
 
-                if (pos == tamY * tamX) break;
+                if (pos == height * width) break;
 
-                while (y > 0 && x < tamX - 1)
+                while (y > 0 && x < width - 1)
                     tabla[pos++] = new Point(++x, --y);
             }
 
             return tabla;
         }
 
-        protected internal static short[] ReordenarZigZag(short[,] coefDct, Point[] orden, int tam)
+        protected internal static short[] ArrayToZigZag(short[,] coefDct, Point[] order, int size)
         {
-            int numElem = tam * tam;
+            int numElem = size * size;
             short[] coefZig = new short[numElem];
 
             for (int i = 0; i < numElem; i++)
             {
-                coefZig[i] = coefDct[orden[i].Y, orden[i].X];
+                coefZig[i] = coefDct[order[i].Y, order[i].X];
             }
 
             return coefZig;
         }
 
-        protected internal static short[,] ComponerZigZag(short[] coefZig, Point[] orden, int tam)
+        protected internal static short[,] ZigZagToArray(short[] coefZig, Point[] order, int size)
         {
-            int numElem = tam * tam;
-            short[,] coefDct = new short[tam, tam];
+            int numElem = size * size;
+            short[,] coefDct = new short[size, size];
 
             for (int i = 0; i < numElem; i++)
             {
-                coefDct[orden[i].Y, orden[i].X] = coefZig[i];
+                coefDct[order[i].Y, order[i].X] = coefZig[i];
             }
 
             return coefDct;

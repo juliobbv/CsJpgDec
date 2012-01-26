@@ -22,18 +22,17 @@ namespace LibPixz
             Eoi = 0xd9
         }
 
-        public static Bitmap Decode(string path, EncodeType tipo)
+        public static List<Bitmap> Decode(string path)
         {
-            MemoryStream stream = LeerArchivo(path);
+            MemoryStream stream = ReadFileToMemory(path);
 
-            return Pixz.Decode(stream, tipo);
+            return Pixz.Decode(stream);
         }
 
-        public static Bitmap Decode(MemoryStream stream, EncodeType tipo)
+        public static List<Bitmap> Decode(MemoryStream stream)
         {
             var reader = new BinaryReader(stream);
-            ImgInfo imgInfo = new ImgInfo();
-            Bitmap bmp = null;
+            var images = new List<Bitmap>();
 
             stream.Seek(0, SeekOrigin.Begin);
 
@@ -46,34 +45,46 @@ namespace LibPixz
             {
                 bool eof = false;
 
-                while (true)
+                for (int image = 1; ; image++)
                 {
-                    while (reader.ReadByte() != 0xff) ;
+                    ImgInfo imgInfo = new ImgInfo();
 
-                    switch ((Markers)reader.ReadByte())
+                    while (true)
                     {
-                        case Markers.App0:
-                            break;
-                        case Markers.Dqt:
-                            Dqt.Read(reader, imgInfo);          
-                            break;
-                        case Markers.Sof0:
-                            Sof0.Read(reader, imgInfo);
-                            break;
-                        case Markers.Dht:
-                            Dht.Read(reader, imgInfo);
-                            break;
-                        case Markers.Sos:
-                            bmp = Sos.Read(reader, imgInfo);
-                            break;
-                        case Markers.Eoi:
-                            eof = true;
-                            break;
-                        default:
-                            break;
-                    }
+                        while (reader.ReadByte() != 0xff) ;
 
-                    if (eof) break;
+                        switch ((Markers)reader.ReadByte())
+                        {
+                            case Markers.App0:
+                                break;
+                            case Markers.Dqt:
+                                Dqt.Read(reader, imgInfo);
+                                break;
+                            case Markers.Sof0:
+                                Sof0.Read(reader, imgInfo);
+                                break;
+                            case Markers.Dht:
+                                Dht.Read(reader, imgInfo);
+                                break;
+                            case Markers.Sos:
+                                images.Add(Sos.Read(reader, imgInfo));
+                                break;
+                            case Markers.Soi:
+                                Logger.WriteLine("Start of Image " + image);
+                                break;
+                            case Markers.Eoi:
+                                eof = true;
+                                break;
+                            default:
+                                break;
+                        }
+
+                        if (eof)
+                        {
+                            eof = false;
+                            break;
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -85,10 +96,10 @@ namespace LibPixz
             Logger.Flush();
 
             //bmp.Save("C:\\progress1.png");
-            return bmp;
+            return images;
         }
 
-        protected static MemoryStream LeerArchivo(string path)
+        protected static MemoryStream ReadFileToMemory(string path)
         {
             MemoryStream stream = new MemoryStream();
             FileStream archivo = File.OpenRead(path);
