@@ -34,6 +34,7 @@ namespace LibPixz
 
         public ushort Peek(uint length, out byte restartMarker)
         {
+            restartMarker = 0;
             if (length > dataSize) throw new Exception("Reading too many bits");
 
             // If we don't have as many bits as needed, read another chunk from stream
@@ -67,7 +68,6 @@ namespace LibPixz
             // We move data left and right in order to get only the bits we require
             uint cleanData = readData << (int)(dataSize * 2 - availableBits);
             cleanData >>= (int)(dataSize * 2 - length);
-            restartMarker = 0;
 
             return (ushort)cleanData;
         }
@@ -81,7 +81,6 @@ namespace LibPixz
             if (restartMarker != 0)
             {
                 availableBits = 0;
-                data = 0;
 
                 return 0;
             }
@@ -128,6 +127,7 @@ namespace LibPixz
                 else if (markerValue >= 0xd0 && markerValue <= 0xd7)
                 {
                     restartMarker = markerValue;
+                    readData = 0;
                     return 0;
                 }
                 else

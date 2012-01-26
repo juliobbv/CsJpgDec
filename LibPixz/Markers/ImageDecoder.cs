@@ -199,7 +199,6 @@ namespace LibPixz.Markers
 
         protected static short[] ObtenerCoef(BitReader bReader, ImgInfo imgInfo, int compIndex, int numCoefs)
         {
-            restart:
             var coefZig = new short[numCoefs];
             int acIndex = imgInfo.components[compIndex].acHuffmanTable;
             int dcIndex = imgInfo.components[compIndex].dcHuffmanTable;
@@ -236,6 +235,8 @@ namespace LibPixz.Markers
                 coefZig[++pos] = Huffman.ReadCoefValue(bReader, amplitude, out restartMarker);
                 if (restartMarker != 0) { ResetDeltas(imgInfo); goto restart; }
             }
+
+        restart:
 
             return coefZig;
         }
