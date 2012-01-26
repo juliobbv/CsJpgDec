@@ -135,6 +135,8 @@ namespace LibPixz.Markers
             Bitmap bmp = new Bitmap(imgInfo.width, imgInfo.height);
             BmpData conv = new BmpData(bmp);
 
+            bReader.StopReading();
+
             conv.SetImage(imagen);
 
             return bmp;

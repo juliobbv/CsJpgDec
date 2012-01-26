@@ -73,6 +73,17 @@ namespace LibPixz
             return data;
         }
 
+        public void StopReading()
+        {
+            if (availableBits >= dataSize)
+            {
+                reader.BaseStream.Seek(-sizeof(ushort), SeekOrigin.Current);
+            }
+
+            availableBits = 0;
+            readData = 0;
+        }
+
         public BinaryReader GetBinaryReader()
         {
             return reader;
