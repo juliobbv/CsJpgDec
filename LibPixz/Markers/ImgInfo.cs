@@ -17,5 +17,8 @@ namespace LibPixz
 
         public HuffmanTable[,] huffmanTables = new HuffmanTable[2, 4];
         public QuantTable[] quantTables = new QuantTable[4];
+
+        public short []deltaDc;
+        public short restartMarker;
     }
 }

@@ -13,13 +13,14 @@ namespace LibPixz
     {
         public enum Markers
         {
+            Literal255 = 0x00,
             Soi = 0xd8,
             App0 = 0xe0,
             Dqt = 0xdb,
             Sof0 = 0xc0,
             Dht = 0xc4,
             Sos = 0xda,
-            Eoi = 0xd9
+            Eoi = 0xd9,
         }
 
         public static List<Bitmap> Decode(string path)
@@ -71,6 +72,8 @@ namespace LibPixz
                                 break;
                             case Markers.Eoi:
                                 eof = true;
+                                break;
+                            case Markers.Literal255:
                                 break;
                             default:
                                 Logger.Write("Unknown marker (" + markerId.ToString("X") + ")");

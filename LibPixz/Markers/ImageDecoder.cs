@@ -13,9 +13,9 @@ namespace LibPixz.Markers
         protected internal static Bitmap DecodeImage(BinaryReader reader, ImgInfo imgInfo)
         {
             BitReader bReader = new BitReader(reader);
-
             float[][,] img = new float[imgInfo.numOfComponents][,];
-            short[] deltaDc = new short[3];
+
+            imgInfo.deltaDc = new short[imgInfo.numOfComponents];
 
             for (int ch = 0; ch < imgInfo.numOfComponents; ch++)
                 img[ch] = new float[imgInfo.height, imgInfo.width];
@@ -40,12 +40,12 @@ namespace LibPixz.Markers
                             int ofsX = x * blkSize * 2;
                             int ofsY = y * blkSize * 2;
 
-                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY, ref deltaDc[0], 1, 1); // Y0
-                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX + blkSize, ofsY, ref deltaDc[0], 1, 1); // Y1
-                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY + blkSize, ref deltaDc[0], 1, 1); // Y2
-                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX + blkSize, ofsY + blkSize, ref deltaDc[0], 1, 1); // Y3
-                            DecodeBlock(bReader, imgInfo, img[1], 1, ofsX, ofsY, ref deltaDc[1], 2, 2); // Cb
-                            DecodeBlock(bReader, imgInfo, img[2], 2, ofsX, ofsY, ref deltaDc[2], 2, 2); // Cr
+                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY, 1, 1); // Y0
+                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX + blkSize, ofsY, 1, 1); // Y1
+                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY + blkSize, 1, 1); // Y2
+                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX + blkSize, ofsY + blkSize, 1, 1); // Y3
+                            DecodeBlock(bReader, imgInfo, img[1], 1, ofsX, ofsY, 2, 2); // Cb
+                            DecodeBlock(bReader, imgInfo, img[2], 2, ofsX, ofsY, 2, 2); // Cr
                         }
                     }
                 }
@@ -66,10 +66,10 @@ namespace LibPixz.Markers
                             int ofsX = x * blkSize;
                             int ofsY = y * blkSize * 2;
 
-                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY, ref deltaDc[0], 1, 1); // Y0
-                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY + blkSize, ref deltaDc[0], 1, 1); // Y1
-                            DecodeBlock(bReader, imgInfo, img[1], 1, ofsX, ofsY, ref deltaDc[1], 1, 2); // Cb
-                            DecodeBlock(bReader, imgInfo, img[2], 2, ofsX, ofsY, ref deltaDc[2], 1, 2); // Cr
+                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY, 1, 1); // Y0
+                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY + blkSize, 1, 1); // Y1
+                            DecodeBlock(bReader, imgInfo, img[1], 1, ofsX, ofsY, 1, 2); // Cb
+                            DecodeBlock(bReader, imgInfo, img[2], 2, ofsX, ofsY, 1, 2); // Cr
                         }
                     }
                 }
@@ -90,10 +90,10 @@ namespace LibPixz.Markers
                             int ofsX = x * blkSize * 2;
                             int ofsY = y * blkSize;
 
-                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY, ref deltaDc[0], 1, 1); // Y0
-                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX + blkSize, ofsY, ref deltaDc[0], 1, 1); // Y1
-                            DecodeBlock(bReader, imgInfo, img[1], 1, ofsX, ofsY, ref deltaDc[1], 2, 1); // Cb
-                            DecodeBlock(bReader, imgInfo, img[2], 2, ofsX, ofsY, ref deltaDc[2], 2, 1); // Cr
+                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY, 1, 1); // Y0
+                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX + blkSize, ofsY, 1, 1); // Y1
+                            DecodeBlock(bReader, imgInfo, img[1], 1, ofsX, ofsY, 2, 1); // Cb
+                            DecodeBlock(bReader, imgInfo, img[2], 2, ofsX, ofsY, 2, 1); // Cr
                         }
                     }
                 }
@@ -114,9 +114,9 @@ namespace LibPixz.Markers
                             int ofsX = x * blkSize;
                             int ofsY = y * blkSize;
 
-                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY, ref deltaDc[0], 1, 1); // Y0
-                            DecodeBlock(bReader, imgInfo, img[1], 1, ofsX, ofsY, ref deltaDc[1], 1, 1); // Cb
-                            DecodeBlock(bReader, imgInfo, img[2], 2, ofsX, ofsY, ref deltaDc[2], 1, 1); // Cr
+                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY, 1, 1); // Y0
+                            DecodeBlock(bReader, imgInfo, img[1], 1, ofsX, ofsY, 1, 1); // Cb
+                            DecodeBlock(bReader, imgInfo, img[2], 2, ofsX, ofsY, 1, 1); // Cr
                         }
                     }
                 }
@@ -165,11 +165,11 @@ namespace LibPixz.Markers
         }
 
         protected static void DecodeBlock(BitReader bReader, ImgInfo imgInfo, float[,] img,
-            int compIndex, int ofsX, int ofsY, ref short deltaDc, int scaleX, int scaleY)
+            int compIndex, int ofsX, int ofsY, int scaleX, int scaleY)
         {
             int quantIndex = imgInfo.components[compIndex].quantTableId;
 
-            short[] coefZig = ObtenerCoef(bReader, imgInfo, compIndex, blkSize * blkSize, ref deltaDc);
+            short[] coefZig = ObtenerCoef(bReader, imgInfo, compIndex, blkSize * blkSize);
             short[,] coefDctB = FileOps.ZigZagToArray(coefZig, FileOps.tablasZigzag[blkSize], blkSize);
             float[,] coefDct = ImgOps.Dequant(coefDctB, imgInfo.quantTables[quantIndex].table, blkSize);
             float[,] imgP = ImgOps.Dct(coefDct, blkSize, blkSize, true);
@@ -197,27 +197,33 @@ namespace LibPixz.Markers
             }
         }
 
-        protected static short[] ObtenerCoef(BitReader bReader, ImgInfo imgInfo, int compIndex, int numCoefs, ref short deltaDc)
+        protected static short[] ObtenerCoef(BitReader bReader, ImgInfo imgInfo, int compIndex, int numCoefs)
         {
+            restart:
             var coefZig = new short[numCoefs];
             int acIndex = imgInfo.components[compIndex].acHuffmanTable;
             int dcIndex = imgInfo.components[compIndex].dcHuffmanTable;
+            byte restartMarker = 0;
 
             // DC coefficient
-            uint runAmplitude = Huffman.ReadRunAmplitude(bReader, imgInfo.huffmanTables[0, dcIndex]);
+            uint runAmplitude = Huffman.ReadRunAmplitude(bReader, imgInfo.huffmanTables[0, dcIndex], out restartMarker);
+            if (restartMarker != 0) { ResetDeltas(imgInfo); goto restart; }
+
             uint run = runAmplitude >> 4;
             uint amplitude = runAmplitude & 0xf;
 
-            coefZig[0] = (short)(Huffman.ReadCoefValue(bReader, amplitude) + deltaDc);
+            coefZig[0] = (short)(Huffman.ReadCoefValue(bReader, amplitude, out restartMarker) + imgInfo.deltaDc[compIndex]);
+            if (restartMarker != 0) { ResetDeltas(imgInfo); goto restart; }
 
-            deltaDc = coefZig[0];
+            imgInfo.deltaDc[compIndex] = coefZig[0];
 
             // AC coefficients
             uint pos = 0;
 
             while (pos < blkSize * blkSize - 1)
             {
-                runAmplitude = Huffman.ReadRunAmplitude(bReader, imgInfo.huffmanTables[1, acIndex]);
+                runAmplitude = Huffman.ReadRunAmplitude(bReader, imgInfo.huffmanTables[1, acIndex], out restartMarker);
+                if (restartMarker != 0) { ResetDeltas(imgInfo); goto restart; }
 
                 if (runAmplitude == 0x00) break;
 
@@ -227,10 +233,19 @@ namespace LibPixz.Markers
 
                 if (pos > 63) break;
 
-                coefZig[++pos] = Huffman.ReadCoefValue(bReader, amplitude);
+                coefZig[++pos] = Huffman.ReadCoefValue(bReader, amplitude, out restartMarker);
+                if (restartMarker != 0) { ResetDeltas(imgInfo); goto restart; }
             }
 
             return coefZig;
+        }
+
+        public static void ResetDeltas(ImgInfo imgInfo)
+        {
+            for (int i = 0; i < imgInfo.numOfComponents; i++)
+            {
+                imgInfo.deltaDc[i] = 0;
+            }
         }
     }
 }

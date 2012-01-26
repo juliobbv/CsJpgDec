@@ -27,20 +27,31 @@ namespace LibPixz
             PreparePreindexedTables(ref huffmanTable);
         }
 
-        public static ushort ReadRunAmplitude(BitReader bReader, HuffmanTable table)
+        public static ushort ReadRunAmplitude(BitReader bReader, HuffmanTable table, out byte restartMarker)
         {
-            ushort code = bReader.Peek(table.maxCodeLength);
-            CodeInfo currentCode = table.preIndexTable[code];
+            ushort code = bReader.Peek(table.maxCodeLength, out restartMarker);
 
-            bReader.Read(currentCode.length);
+            if (restartMarker != 0) return 0;
+
+            CodeInfo currentCode = table.preIndexTable[code];
+            bReader.Read(currentCode.length, out restartMarker);
+
+            if (restartMarker != 0) return 0;
 
             return currentCode.number;
         }
 
-        public static short ReadCoefValue(BitReader bReader, uint size)
+        public static short ReadCoefValue(BitReader bReader, uint size, out byte restartMarker)
         {
-            if (size == 0) return 0;
-            ushort specialBits = bReader.Read(size);
+            if (size == 0)
+            {
+                restartMarker = 0;
+                return 0;
+            }
+
+            ushort specialBits = bReader.Read(size, out restartMarker);
+
+            if (restartMarker != 0) return 0;
 
             return SpecialBitsToValue(specialBits, (short)size);
         }
