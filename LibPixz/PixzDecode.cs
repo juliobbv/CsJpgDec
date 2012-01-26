@@ -36,11 +36,6 @@ namespace LibPixz
 
             stream.Seek(0, SeekOrigin.Begin);
 
-            while (reader.ReadByte() != 0xff) ;
-
-            if ((Markers)reader.ReadByte() != Markers.Soi)
-                throw new Exception("Invalid JPEG file");
-
             try
             {
                 bool eof = false;
@@ -52,8 +47,9 @@ namespace LibPixz
                     while (true)
                     {
                         while (reader.ReadByte() != 0xff) ;
+                        int markerId = reader.ReadByte();
 
-                        switch ((Markers)reader.ReadByte())
+                        switch ((Markers)markerId)
                         {
                             case Markers.App0:
                                 break;
@@ -70,12 +66,15 @@ namespace LibPixz
                                 images.Add(Sos.Read(reader, imgInfo));
                                 break;
                             case Markers.Soi:
-                                Logger.WriteLine("Start of Image " + image);
+                                Logger.Write("Start of Image " + image);
+                                Logger.WriteLine(" at: " + reader.BaseStream.Position.ToString("X"));
                                 break;
                             case Markers.Eoi:
                                 eof = true;
                                 break;
                             default:
+                                Logger.Write("Unknown marker (" + markerId.ToString("X") + ")");
+                                Logger.WriteLine(" at: " + reader.BaseStream.Position.ToString("X"));
                                 break;
                         }
 

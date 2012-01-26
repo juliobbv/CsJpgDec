@@ -76,7 +76,7 @@ namespace LibPixz
         public void StopReading()
         {
             // Rewind all those bytes we didn't use
-            uint rewind = availableBits / sizeof(byte);
+            uint rewind = availableBits / sizeof(byte) + 1;
 
             reader.BaseStream.Seek(-rewind, SeekOrigin.Current);
             availableBits = 0;
