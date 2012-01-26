@@ -40,12 +40,20 @@ namespace LibPixz.Markers
                             int ofsX = x * blkSize * 2;
                             int ofsY = y * blkSize * 2;
 
+                            try
+                            {
                             DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY, 1, 1); // Y0
                             DecodeBlock(bReader, imgInfo, img[0], 0, ofsX + blkSize, ofsY, 1, 1); // Y1
                             DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY + blkSize, 1, 1); // Y2
                             DecodeBlock(bReader, imgInfo, img[0], 0, ofsX + blkSize, ofsY + blkSize, 1, 1); // Y3
                             DecodeBlock(bReader, imgInfo, img[1], 1, ofsX, ofsY, 2, 2); // Cb
                             DecodeBlock(bReader, imgInfo, img[2], 2, ofsX, ofsY, 2, 2); // Cr
+                            }
+                            catch (Exception ex)
+                            {
+                                if (ex.Message == "Restart") { ResetDeltas(imgInfo); }
+                                else throw;
+                            }
                         }
                     }
                 }
@@ -66,10 +74,18 @@ namespace LibPixz.Markers
                             int ofsX = x * blkSize;
                             int ofsY = y * blkSize * 2;
 
+                            try
+                            {
                             DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY, 1, 1); // Y0
                             DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY + blkSize, 1, 1); // Y1
                             DecodeBlock(bReader, imgInfo, img[1], 1, ofsX, ofsY, 1, 2); // Cb
                             DecodeBlock(bReader, imgInfo, img[2], 2, ofsX, ofsY, 1, 2); // Cr
+                            }
+                            catch (Exception ex)
+                            {
+                                if (ex.Message == "Restart") { ResetDeltas(imgInfo); }
+                                else throw;
+                            }
                         }
                     }
                 }
@@ -90,10 +106,18 @@ namespace LibPixz.Markers
                             int ofsX = x * blkSize * 2;
                             int ofsY = y * blkSize;
 
-                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY, 1, 1); // Y0
-                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX + blkSize, ofsY, 1, 1); // Y1
-                            DecodeBlock(bReader, imgInfo, img[1], 1, ofsX, ofsY, 2, 1); // Cb
-                            DecodeBlock(bReader, imgInfo, img[2], 2, ofsX, ofsY, 2, 1); // Cr
+                            try
+                            {
+                                DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY, 1, 1); // Y0
+                                DecodeBlock(bReader, imgInfo, img[0], 0, ofsX + blkSize, ofsY, 1, 1); // Y1
+                                DecodeBlock(bReader, imgInfo, img[1], 1, ofsX, ofsY, 2, 1); // Cb
+                                DecodeBlock(bReader, imgInfo, img[2], 2, ofsX, ofsY, 2, 1); // Cr
+                            }
+                            catch (Exception ex)
+                            {
+                                if (ex.Message == "Restart") { ResetDeltas(imgInfo); }
+                                else throw;
+                            }
                         }
                     }
                 }
@@ -114,9 +138,17 @@ namespace LibPixz.Markers
                             int ofsX = x * blkSize;
                             int ofsY = y * blkSize;
 
-                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY, 1, 1); // Y0
-                            DecodeBlock(bReader, imgInfo, img[1], 1, ofsX, ofsY, 1, 1); // Cb
-                            DecodeBlock(bReader, imgInfo, img[2], 2, ofsX, ofsY, 1, 1); // Cr
+                            try
+                            {
+                                DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY, 1, 1); // Y0
+                                DecodeBlock(bReader, imgInfo, img[1], 1, ofsX, ofsY, 1, 1); // Cb
+                                DecodeBlock(bReader, imgInfo, img[2], 2, ofsX, ofsY, 1, 1); // Cr
+                            }
+                            catch (Exception ex)
+                            {
+                                if (ex.Message == "Restart") { ResetDeltas(imgInfo);}
+                                else throw;
+                            }
                         }
                     }
                 }
@@ -202,17 +234,14 @@ namespace LibPixz.Markers
             var coefZig = new short[numCoefs];
             int acIndex = imgInfo.components[compIndex].acHuffmanTable;
             int dcIndex = imgInfo.components[compIndex].dcHuffmanTable;
-            byte restartMarker = 0;
 
             // DC coefficient
-            uint runAmplitude = Huffman.ReadRunAmplitude(bReader, imgInfo.huffmanTables[0, dcIndex], out restartMarker);
-            if (restartMarker != 0) { ResetDeltas(imgInfo); goto restart; }
+            uint runAmplitude = Huffman.ReadRunAmplitude(bReader, imgInfo.huffmanTables[0, dcIndex]);
 
             uint run = runAmplitude >> 4;
             uint amplitude = runAmplitude & 0xf;
 
-            coefZig[0] = (short)(Huffman.ReadCoefValue(bReader, amplitude, out restartMarker) + imgInfo.deltaDc[compIndex]);
-            if (restartMarker != 0) { ResetDeltas(imgInfo); goto restart; }
+            coefZig[0] = (short)(Huffman.ReadCoefValue(bReader, amplitude) + imgInfo.deltaDc[compIndex]);
 
             imgInfo.deltaDc[compIndex] = coefZig[0];
 
@@ -221,8 +250,7 @@ namespace LibPixz.Markers
 
             while (pos < blkSize * blkSize - 1)
             {
-                runAmplitude = Huffman.ReadRunAmplitude(bReader, imgInfo.huffmanTables[1, acIndex], out restartMarker);
-                if (restartMarker != 0) { ResetDeltas(imgInfo); goto restart; }
+                runAmplitude = Huffman.ReadRunAmplitude(bReader, imgInfo.huffmanTables[1, acIndex]);
 
                 if (runAmplitude == 0x00) break;
 
@@ -232,11 +260,8 @@ namespace LibPixz.Markers
 
                 if (pos > 63) break;
 
-                coefZig[++pos] = Huffman.ReadCoefValue(bReader, amplitude, out restartMarker);
-                if (restartMarker != 0) { ResetDeltas(imgInfo); goto restart; }
+                coefZig[++pos] = Huffman.ReadCoefValue(bReader, amplitude);
             }
-
-        restart:
 
             return coefZig;
         }

@@ -32,9 +32,8 @@ namespace LibPixz
             this.reader = reader;
         }
 
-        public ushort Peek(uint length, out byte restartMarker)
+        public ushort Peek(uint length)
         {
-            restartMarker = 0;
             if (length > dataSize) throw new Exception("Reading too many bits");
 
             // If we don't have as many bits as needed, read another chunk from stream
@@ -46,9 +45,7 @@ namespace LibPixz
                 {
                     while (availableBits <= length)
                     {
-                        nextChunk = ReadByteNonStuffed(out restartMarker);
-
-                        if (restartMarker != 0x00) return 0;
+                        nextChunk = ReadByteNonStuffed();
 
                         availableBits += readerSize;
                         readData = (readData << (int)readerSize) | nextChunk;
@@ -56,8 +53,10 @@ namespace LibPixz
                 }
                 // If already at the end of stream, next chunk will be all zeros,
                 // so we can decode the last blocks of the image
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    if (ex.Message == "Restart") throw;
+
                     if (dataPad)
                         throw new Exception("Reading two padding chunks, stream may be faulty");
 
@@ -72,18 +71,11 @@ namespace LibPixz
             return (ushort)cleanData;
         }
 
-        public ushort Read(uint length, out byte restartMarker)
+        public ushort Read(uint length)
         {
             if (length > dataSize) throw new Exception("Reading too many bits");
 
-            ushort data = Peek(length, out restartMarker);
-
-            if (restartMarker != 0)
-            {
-                availableBits = 0;
-
-                return 0;
-            }
+            ushort data = Peek(length);
 
             availableBits -= length;
 
@@ -110,11 +102,9 @@ namespace LibPixz
             return reader;
         }
 
-        public byte ReadByteNonStuffed(out byte restartMarker)
+        public byte ReadByteNonStuffed()
         {
             byte number = reader.ReadByte();
-
-            restartMarker = 0;
 
             if (number == 0xff)
             {
@@ -126,13 +116,12 @@ namespace LibPixz
                 }
                 else if (markerValue >= 0xd0 && markerValue <= 0xd7)
                 {
-                    restartMarker = markerValue;
                     readData = 0;
-                    return 0;
+                    availableBits = 0;
+                    throw new Exception("Restart");
                 }
                 else
                 {
-                    restartMarker = 0;
                     return reader.ReadByte();
                 }
             }
