@@ -51,6 +51,7 @@ namespace LibPixz.Markers
 
             var tabla = FileOps.tablasZigzag[8];
 
+            // Quantizer tables are in zigzag too!
             if (quantTable.precision == 0)
             {
                 for (int i = 0; i < 64; i++)

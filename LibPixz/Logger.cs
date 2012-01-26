@@ -8,7 +8,7 @@ namespace LibPixz
 {
     public class Logger
     {
-        static StreamWriter writer = new StreamWriter("pixzLog.txt", true);
+        static StreamWriter writer = new StreamWriter("pixzLog.txt" );
 
         protected internal static void WriteLine()
         {

@@ -52,8 +52,8 @@ namespace LibPixz.Markers
 
                 byte samplingFactor = reader.ReadByte();
 
-                imgInfo.components[id].samplingFactorX = (byte)(samplingFactor & 0x0f);
-                imgInfo.components[id].samplingFactorY = (byte)(samplingFactor >> 4);
+                imgInfo.components[id].samplingFactorX = (byte)(samplingFactor >> 4);
+                imgInfo.components[id].samplingFactorY = (byte)(samplingFactor & 0x0f);
 
                 imgInfo.components[id].quantTableId = reader.ReadByte();
             }

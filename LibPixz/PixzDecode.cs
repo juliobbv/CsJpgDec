@@ -76,7 +76,10 @@ namespace LibPixz
                     if (eof) break;
                 }
             }
-            catch (Exception) { }
+            catch (Exception ex)
+            {
+                Logger.WriteLine(ex.Message);
+            }
 
             reader.Close();
             Logger.Flush();

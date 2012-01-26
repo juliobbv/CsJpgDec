@@ -49,30 +49,6 @@ namespace LibPixz.Markers
                         }
                     }
                 }
-                else if (imgInfo.components[0].samplingFactorX == 2 &&
-                         imgInfo.components[0].samplingFactorY == 1 &&
-                         imgInfo.components[1].samplingFactorX == 1 &&
-                         imgInfo.components[1].samplingFactorY == 1 &&
-                         imgInfo.components[2].samplingFactorX == 1 &&
-                         imgInfo.components[2].samplingFactorY == 1)
-                {
-                    int numTilesX = (imgInfo.width + blkSize * 2 - 1) / (blkSize * 2);
-                    int numTilesY = (imgInfo.height + blkSize - 1) / blkSize;
-
-                    for (int y = 0; y < numTilesY; y++)
-                    {
-                        for (int x = 0; x < numTilesX / 2; x++)
-                        {
-                            int ofsX = x * blkSize * 2;
-                            int ofsY = y * blkSize;
-
-                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY, ref deltaDc[0], 1, 1); // Y0
-                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX + blkSize, ofsY, ref deltaDc[0], 1, 1); // Y1
-                            DecodeBlock(bReader, imgInfo, img[1], 1, ofsX, ofsY, ref deltaDc[1], 2, 1); // Cb
-                            DecodeBlock(bReader, imgInfo, img[2], 2, ofsX, ofsY, ref deltaDc[2], 2, 1); // Cr
-                        }
-                    }
-                }
                 else if (imgInfo.components[0].samplingFactorX == 1 &&
                          imgInfo.components[0].samplingFactorY == 2 &&
                          imgInfo.components[1].samplingFactorX == 1 &&
@@ -94,6 +70,30 @@ namespace LibPixz.Markers
                             DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY + blkSize, ref deltaDc[0], 1, 1); // Y1
                             DecodeBlock(bReader, imgInfo, img[1], 1, ofsX, ofsY, ref deltaDc[1], 1, 2); // Cb
                             DecodeBlock(bReader, imgInfo, img[2], 2, ofsX, ofsY, ref deltaDc[2], 1, 2); // Cr
+                        }
+                    }
+                }
+                else if (imgInfo.components[0].samplingFactorX == 2 &&
+                         imgInfo.components[0].samplingFactorY == 1 &&
+                         imgInfo.components[1].samplingFactorX == 1 &&
+                         imgInfo.components[1].samplingFactorY == 1 &&
+                         imgInfo.components[2].samplingFactorX == 1 &&
+                         imgInfo.components[2].samplingFactorY == 1)
+                {
+                    int numTilesX = (imgInfo.width + blkSize * 2 - 1) / (blkSize * 2);
+                    int numTilesY = (imgInfo.height + blkSize - 1) / blkSize;
+
+                    for (int y = 0; y < numTilesY; y++)
+                    {
+                        for (int x = 0; x < numTilesX; x++)
+                        {
+                            int ofsX = x * blkSize * 2;
+                            int ofsY = y * blkSize;
+
+                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY, ref deltaDc[0], 1, 1); // Y0
+                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX + blkSize, ofsY, ref deltaDc[0], 1, 1); // Y1
+                            DecodeBlock(bReader, imgInfo, img[1], 1, ofsX, ofsY, ref deltaDc[1], 2, 1); // Cb
+                            DecodeBlock(bReader, imgInfo, img[2], 2, ofsX, ofsY, ref deltaDc[2], 2, 1); // Cr
                         }
                     }
                 }
@@ -125,7 +125,11 @@ namespace LibPixz.Markers
                     throw new Exception();
                 }
             }
-            catch (Exception) { }
+            catch (Exception ex)
+            {
+                Logger.WriteLine(ex.Message);
+                Logger.WriteLine(ex.StackTrace);
+            }
 
             Color[,] imagen = UnirCanales(imgInfo, img);
             Bitmap bmp = new Bitmap(imgInfo.width, imgInfo.height);
@@ -168,7 +172,7 @@ namespace LibPixz.Markers
             float[,] coefDct = ImgOps.Dequant(coefDctB, imgInfo.quantTables[quantIndex].table, blkSize);
             float[,] imgP = ImgOps.Dct(coefDct, blkSize, blkSize, true);
 
-            if (scaleX != 1 && scaleY != 1)
+            if (scaleX != 1 || scaleY != 1)
                 imgP = ImgOps.NearestNeighborResize(imgP, blkSize, blkSize, scaleX, scaleY);
 
             ComponerBloque(imgInfo, img, imgP, blkSize * scaleX, blkSize * scaleY, ofsX, ofsY);
