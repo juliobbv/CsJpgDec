@@ -13,7 +13,9 @@ namespace LibPixz
         BinaryReader reader;
         uint readData;
         uint availableBits;
+        uint nonFakeBits;
         bool dataPad;
+        byte markerData;
 
         /// <summary>
         /// How many bits we read at once in the stream
@@ -26,7 +28,9 @@ namespace LibPixz
         public BitReader(BinaryReader reader)
         {
             availableBits = 0;
+            nonFakeBits = 0;
             readData = 0;
+            markerData = 0;
             dataPad = false;
 
             this.reader = reader;
@@ -46,9 +50,10 @@ namespace LibPixz
                     while (availableBits <= length)
                     {
                         nextChunk = ReadByteNonStuffed();
-
                         availableBits += readerSize;
                         readData = (readData << (int)readerSize) | nextChunk;
+
+                        if (markerData == 0x00) nonFakeBits = availableBits;
                     }
                 }
                 // If already at the end of stream, next chunk will be all zeros,
@@ -75,9 +80,16 @@ namespace LibPixz
         {
             if (length > dataSize) throw new Exception("Reading too many bits");
 
+            if ((markerData != 0x00) && (length > nonFakeBits))
+            {
+                PurgeData();
+                throw new Exception("Restart");
+            }
+
             ushort data = Peek(length);
 
             availableBits -= length;
+            nonFakeBits -= length;
 
             int shift = (int)(dataSize * 2 - availableBits);
             // We move data left and right in order to get only the bits we require
@@ -90,11 +102,10 @@ namespace LibPixz
         public void StopReading()
         {
             // Rewind all those bytes we didn't use
-            uint rewind = availableBits / sizeof(byte);
+            uint rewind = nonFakeBits / sizeof(byte);
 
             reader.BaseStream.Seek(-rewind, SeekOrigin.Current);
-            availableBits = 0;
-            readData = 0;
+            PurgeData();
         }
 
         public BinaryReader GetBinaryReader()
@@ -104,6 +115,8 @@ namespace LibPixz
 
         public byte ReadByteNonStuffed()
         {
+            if (markerData != 0x00) return 0;
+
             byte number = reader.ReadByte();
 
             if (number == 0xff)
@@ -116,9 +129,8 @@ namespace LibPixz
                 }
                 else if (markerValue >= 0xd0 && markerValue <= 0xd7)
                 {
-                    readData = 0;
-                    availableBits = 0;
-                    throw new Exception("Restart");
+                    markerData = markerValue;
+                    return 0;
                 }
                 else
                 {
@@ -129,6 +141,25 @@ namespace LibPixz
             {
                 return number;
             }
+        }
+
+        public bool WasRestartMarkerFound()
+        {
+            if (markerData != 0)
+            {
+                PurgeData();
+                return true;
+            }
+
+            return false;
+        }
+
+        public void PurgeData()
+        {
+            nonFakeBits = 0;
+            availableBits = 0;
+            readData = 0;
+            markerData = 0;
         }
     }
 }

@@ -40,6 +40,8 @@ namespace LibPixz.Markers
                             int ofsX = x * blkSize * 2;
                             int ofsY = y * blkSize * 2;
 
+                            if (bReader.WasRestartMarkerFound()) ResetDeltas(imgInfo);
+
                             try
                             {
                             DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY, 1, 1); // Y0
@@ -74,6 +76,8 @@ namespace LibPixz.Markers
                             int ofsX = x * blkSize;
                             int ofsY = y * blkSize * 2;
 
+                            if (bReader.WasRestartMarkerFound()) ResetDeltas(imgInfo);
+
                             try
                             {
                             DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY, 1, 1); // Y0
@@ -106,6 +110,8 @@ namespace LibPixz.Markers
                             int ofsX = x * blkSize * 2;
                             int ofsY = y * blkSize;
 
+                            if (bReader.WasRestartMarkerFound()) ResetDeltas(imgInfo);
+
                             try
                             {
                                 DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY, 1, 1); // Y0
@@ -137,6 +143,8 @@ namespace LibPixz.Markers
                         {
                             int ofsX = x * blkSize;
                             int ofsY = y * blkSize;
+
+                            if (bReader.WasRestartMarkerFound()) ResetDeltas(imgInfo);
 
                             try
                             {
