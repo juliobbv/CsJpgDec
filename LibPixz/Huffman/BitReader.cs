@@ -14,7 +14,7 @@ namespace LibPixz
         uint readData;
         uint availableBits;
         bool dataPad;
-        byte markerData;
+        byte restartMarker;
 
         /// <summary>
         /// How many bits we read at once in the stream
@@ -26,9 +26,7 @@ namespace LibPixz
 
         public BitReader(BinaryReader reader)
         {
-            availableBits = 0;
-            readData = 0;
-            markerData = 0;
+            Flush();
             dataPad = false;
 
             this.reader = reader;
@@ -49,13 +47,18 @@ namespace LibPixz
                     {
                         nextChunk = ReadByteNonStuffed();
 
+                        // Restart markers count as a virtual 'stop' when reading from the stream
+                        if (restartMarker != 0) break;
+
                         availableBits += readerSize;
                         readData = (readData << (int)readerSize) | nextChunk;
                     }
                 }
-                // If already at the end of stream, next chunk will be all zeros,
-                // so we can decode the last blocks of the image
-                catch (Exception ex)
+                // If already at the end of stream, use only the remaining bits we have read
+                // before. Because the number of requested bits is less than the available bits,
+                // the result of the clean data has the number of missing bits as zeros appended to
+                // the right, as the huffman decoding phase needs a fixed number of bits to work
+                catch (Exception)
                 {
                     if (dataPad)
                         throw new Exception("Reading two padding chunks, stream may be faulty");
@@ -93,7 +96,7 @@ namespace LibPixz
             uint rewind = availableBits / sizeof(byte);
 
             reader.BaseStream.Seek(-rewind, SeekOrigin.Current);
-            PurgeData();
+            Flush();
         }
 
         public BinaryReader GetBinaryReader()
@@ -103,7 +106,7 @@ namespace LibPixz
 
         public byte ReadByteNonStuffed()
         {
-            if (markerData != 0x00) return 0;
+            if (restartMarker != 0x00) return 0;
 
             byte number = reader.ReadByte();
 
@@ -117,7 +120,7 @@ namespace LibPixz
                 }
                 else if (markerValue >= 0xd0 && markerValue <= 0xd7)
                 {
-                    markerData = markerValue;
+                    restartMarker = markerValue;
                     return 0;
                 }
                 else
@@ -133,20 +136,20 @@ namespace LibPixz
 
         public bool WasRestartMarkerFound()
         {
-            if (markerData != 0)
+            if (restartMarker != 0)
             {
-                PurgeData();
+                Flush();
                 return true;
             }
 
             return false;
         }
 
-        public void PurgeData()
+        public void Flush()
         {
             availableBits = 0;
             readData = 0;
-            markerData = 0;
+            restartMarker = 0;
         }
     }
 }
