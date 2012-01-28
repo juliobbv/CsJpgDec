@@ -54,13 +54,11 @@
             // 
             // pbxOriginal
             // 
-            this.pbxOriginal.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
             this.pbxOriginal.Location = new System.Drawing.Point(4, 5);
             this.pbxOriginal.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.pbxOriginal.Name = "pbxOriginal";
-            this.pbxOriginal.Size = new System.Drawing.Size(750, 477);
+            this.pbxOriginal.Size = new System.Drawing.Size(744, 472);
+            this.pbxOriginal.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pbxOriginal.TabIndex = 1;
             this.pbxOriginal.TabStop = false;
             this.pbxOriginal.BackgroundImageChanged += new System.EventHandler(this.pbxOriginal_BackgroundImageChanged);
@@ -137,6 +135,7 @@
             this.Text = "Pixz";
             ((System.ComponentModel.ISupportInitialize)(this.pbxOriginal)).EndInit();
             this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudImagen)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

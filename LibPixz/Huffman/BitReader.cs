@@ -10,6 +10,7 @@ namespace LibPixz
     {
         const uint dataSize = sizeof(ushort) * 8;
         const uint readerSize = sizeof(byte) * 8;
+
         BinaryReader reader;
         uint readData;
         uint availableBits;
@@ -45,10 +46,10 @@ namespace LibPixz
                 {
                     while (availableBits <= length)
                     {
-                        nextChunk = ReadByteNonStuffed();
-
                         // Restart markers count as a virtual 'stop' when reading from the stream
                         if (restartMarker != 0) break;
+
+                        nextChunk = ReadByteNonStuffed();
 
                         availableBits += readerSize;
                         readData = (readData << (int)readerSize) | nextChunk;
@@ -92,7 +93,7 @@ namespace LibPixz
 
         public void StopReading()
         {
-            // Rewind all those bytes we didn't use
+            // Rewind all (whole) bytes we didn't use
             uint rewind = availableBits / sizeof(byte);
 
             reader.BaseStream.Seek(-rewind, SeekOrigin.Current);
@@ -106,8 +107,6 @@ namespace LibPixz
 
         public byte ReadByteNonStuffed()
         {
-            if (restartMarker != 0x00) return 0;
-
             byte number = reader.ReadByte();
 
             if (number == 0xff)
@@ -118,7 +117,7 @@ namespace LibPixz
                 {
                     return number;
                 }
-                else if (markerValue >= 0xd0 && markerValue <= 0xd7)
+                else if (markerValue >= (int)Pixz.MarkersId.Rs0 && markerValue <= (int)Pixz.MarkersId.Rs7)
                 {
                     restartMarker = markerValue;
                     return 0;
