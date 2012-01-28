@@ -54,8 +54,8 @@
             // 
             // pbxOriginal
             // 
-            this.pbxOriginal.Location = new System.Drawing.Point(4, 5);
-            this.pbxOriginal.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.pbxOriginal.Location = new System.Drawing.Point(0, 0);
+            this.pbxOriginal.Margin = new System.Windows.Forms.Padding(0, 0, 0, 0);
             this.pbxOriginal.Name = "pbxOriginal";
             this.pbxOriginal.Size = new System.Drawing.Size(744, 472);
             this.pbxOriginal.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;

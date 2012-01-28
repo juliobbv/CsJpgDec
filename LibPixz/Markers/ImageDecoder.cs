@@ -262,7 +262,7 @@ namespace LibPixz.Markers
                 amplitude = runAmplitude & 0xf;
                 pos += run;
 
-                if (pos > 63) break;
+                if (pos >= 63) break;
 
                 coefZig[++pos] = Huffman.ReadCoefValue(bReader, amplitude);
             }
