@@ -51,10 +51,9 @@ namespace LibPixz.Markers
                             DecodeBlock(bReader, imgInfo, img[1], 1, ofsX, ofsY, 2, 2); // Cb
                             DecodeBlock(bReader, imgInfo, img[2], 2, ofsX, ofsY, 2, 2); // Cr
                             }
-                            catch (Exception ex)
+                            catch (Exception)
                             {
-                                if (ex.Message == "Restart") { ResetDeltas(imgInfo); }
-                                else throw;
+                                throw;
                             }
                         }
                     }
@@ -85,10 +84,9 @@ namespace LibPixz.Markers
                             DecodeBlock(bReader, imgInfo, img[1], 1, ofsX, ofsY, 1, 2); // Cb
                             DecodeBlock(bReader, imgInfo, img[2], 2, ofsX, ofsY, 1, 2); // Cr
                             }
-                            catch (Exception ex)
+                            catch (Exception)
                             {
-                                if (ex.Message == "Restart") { ResetDeltas(imgInfo); }
-                                else throw;
+                                throw;
                             }
                         }
                     }
@@ -119,10 +117,9 @@ namespace LibPixz.Markers
                                 DecodeBlock(bReader, imgInfo, img[1], 1, ofsX, ofsY, 2, 1); // Cb
                                 DecodeBlock(bReader, imgInfo, img[2], 2, ofsX, ofsY, 2, 1); // Cr
                             }
-                            catch (Exception ex)
+                            catch (Exception)
                             {
-                                if (ex.Message == "Restart") { ResetDeltas(imgInfo); }
-                                else throw;
+                                throw;
                             }
                         }
                     }
@@ -152,10 +149,9 @@ namespace LibPixz.Markers
                                 DecodeBlock(bReader, imgInfo, img[1], 1, ofsX, ofsY, 1, 1); // Cb
                                 DecodeBlock(bReader, imgInfo, img[2], 2, ofsX, ofsY, 1, 1); // Cr
                             }
-                            catch (Exception ex)
+                            catch (Exception)
                             {
-                                if (ex.Message == "Restart") { ResetDeltas(imgInfo);}
-                                else throw;
+                                throw;
                             }
                         }
                     }
