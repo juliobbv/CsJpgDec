@@ -11,7 +11,7 @@ namespace LibPixz
 {
     public partial class Pixz
     {
-        public enum Markers
+        public enum MarkersId
         {
             Literal255 = 0x00,
             Soi = 0xd8,
@@ -19,6 +19,8 @@ namespace LibPixz
             Dqt = 0xdb,
             Sof0 = 0xc0,
             Dht = 0xc4,
+            Rs0 = 0xd0,
+            Rs7 = 0xd7,
             Sos = 0xda,
             Eoi = 0xd9,
         }
@@ -50,30 +52,30 @@ namespace LibPixz
                         while (reader.ReadByte() != 0xff) ;
                         int markerId = reader.ReadByte();
 
-                        switch ((Markers)markerId)
+                        switch ((MarkersId)markerId)
                         {
-                            case Markers.App0:
+                            case MarkersId.App0:
                                 break;
-                            case Markers.Dqt:
+                            case MarkersId.Dqt:
                                 Dqt.Read(reader, imgInfo);
                                 break;
-                            case Markers.Sof0:
+                            case MarkersId.Sof0:
                                 Sof0.Read(reader, imgInfo);
                                 break;
-                            case Markers.Dht:
+                            case MarkersId.Dht:
                                 Dht.Read(reader, imgInfo);
                                 break;
-                            case Markers.Sos:
+                            case MarkersId.Sos:
                                 images.Add(Sos.Read(reader, imgInfo));
                                 break;
-                            case Markers.Soi:
+                            case MarkersId.Soi:
                                 Logger.Write("Start of Image " + image);
                                 Logger.WriteLine(" at: " + reader.BaseStream.Position.ToString("X"));
                                 break;
-                            case Markers.Eoi:
+                            case MarkersId.Eoi:
                                 eof = true;
                                 break;
-                            case Markers.Literal255:
+                            case MarkersId.Literal255:
                                 break;
                             default:
                                 Logger.Write("Unknown marker (" + markerId.ToString("X") + ")");
