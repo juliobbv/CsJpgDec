@@ -45,7 +45,8 @@ namespace LibPixz.Markers
                         int ofsX = x * sizeBlockX;
                         int ofsY = y * sizeBlockY;
 
-                        if (bReader.WasRestartMarkerFound()) ResetDeltas(imgInfo);
+                        if (bReader.WasRestartMarkerFound()) { bReader.Flush(); ResetDeltas(imgInfo); }
+                        if (bReader.PastEndOfFile) { break; }
 
                         for (int ch = 0; ch < imgInfo.numOfComponents; ch++)
                         {
@@ -60,6 +61,8 @@ namespace LibPixz.Markers
                             }
                         }
                     }
+
+                    if (bReader.PastEndOfFile) { break;  }
                 }
             }
             catch (Exception ex)

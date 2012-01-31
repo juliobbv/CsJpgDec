@@ -6,6 +6,9 @@ using System.IO;
 
 namespace LibPixz
 {
+    /// <summary>
+    /// Restart marker-aware bit reader for JPEG decoding
+    /// </summary>
     public class BitReader
     {
         const uint dataSize = sizeof(ushort) * 8;
@@ -18,11 +21,27 @@ namespace LibPixz
         byte restartMarker;
 
         /// <summary>
-        /// How many bits we read at once in the stream
+        /// Returns how many bits we read at once in the stream
         /// </summary>
         public uint BitStride
         {
             get { return dataSize; }
+        }
+
+        /// <summary>
+        /// Returns true if end of file has been reached and reader is padding with zeros
+        /// </summary>
+        public bool PastEndOfFile
+        {
+            get { return dataPad; }
+        }
+
+        /// <summary>
+        /// Returns the BinaryReader the BitReader is using
+        /// </summary>
+        public BinaryReader BaseBinaryReader
+        {
+            get { return reader; }
         }
 
         public BitReader(BinaryReader reader)
@@ -33,6 +52,14 @@ namespace LibPixz
             this.reader = reader;
         }
 
+        /// <summary>
+        /// Peeks a certain number of bits from a certain stream
+        /// </summary>
+        /// <param name="length">The number of bits we want to read from the stream</param>
+        /// <returns>An unsigned 2 byte integer containing the requested bits, with enough leading
+        /// zeros to pad the result, and trailing zeros to fill the requested length if past the
+        /// end of stream
+        /// </returns>
         public ushort Peek(uint length)
         {
             if (length > dataSize) throw new Exception("Reading too many bits");
@@ -46,7 +73,7 @@ namespace LibPixz
                 {
                     while (availableBits <= length)
                     {
-                        // Restart markers count as a virtual 'stop' when reading from the stream
+                        // Restart markers count as a virtual "barrier" when reading from the stream
                         if (restartMarker != 0) break;
 
                         nextChunk = ReadByteNonStuffed();
@@ -59,11 +86,8 @@ namespace LibPixz
                 // before. Because the number of requested bits is less than the available bits,
                 // the result of the clean data has the number of missing bits as zeros appended to
                 // the right, as the huffman decoding phase needs a fixed number of bits to work
-                catch (Exception)
+                catch (EndOfStreamException)
                 {
-                    if (dataPad)
-                        throw new Exception("Reading two padding chunks, stream may be faulty");
-
                     dataPad = true;
                 }
             }
@@ -75,6 +99,14 @@ namespace LibPixz
             return (ushort)cleanData;
         }
 
+        /// <summary>
+        /// Reads a certain number of bits from a certain stream
+        /// </summary>
+        /// <param name="length">The number of bits we want to read from the stream</param>
+        /// <returns>An unsigned 2 byte integer containing the requested bits, with enough leading
+        /// zeros to pad the result, and trailing zeros to fill the requested length if past the
+        /// end of stream
+        /// </returns>
         public ushort Read(uint length)
         {
             if (length > dataSize) throw new Exception("Reading too many bits");
@@ -91,21 +123,43 @@ namespace LibPixz
             return data;
         }
 
+        /// <summary>
+        /// Flush all data in the buffer and rewinds all readahead bytes
+        /// </summary>
         public void StopReading()
         {
-            // Rewind all (whole) bytes we didn't use
-            uint rewind = availableBits / sizeof(byte);
+            if (!dataPad)
+            {
+                // Rewind all (whole) bytes we didn't use
+                uint rewind = availableBits / sizeof(byte);
 
-            reader.BaseStream.Seek(-rewind, SeekOrigin.Current);
+                reader.BaseStream.Seek(-rewind, SeekOrigin.Current);
+            }
+
             Flush();
         }
 
-        public BinaryReader GetBinaryReader()
+        /// <summary>
+        /// Deletes all data in the buffer, without rewinding all readahead bytes
+        /// in stream
+        /// </summary>
+        public void Flush()
         {
-            return reader;
+            availableBits = 0;
+            readData = 0;
+            restartMarker = 0;
         }
 
-        public byte ReadByteNonStuffed()
+        /// <summary>
+        /// Checks if a restart marker was found in a stream
+        /// </summary>
+        /// <returns></returns>
+        public bool WasRestartMarkerFound()
+        {
+            return restartMarker != 0;
+        }
+
+        private byte ReadByteNonStuffed()
         {
             byte number = reader.ReadByte();
 
@@ -131,24 +185,6 @@ namespace LibPixz
             {
                 return number;
             }
-        }
-
-        public bool WasRestartMarkerFound()
-        {
-            if (restartMarker != 0)
-            {
-                Flush();
-                return true;
-            }
-
-            return false;
-        }
-
-        public void Flush()
-        {
-            availableBits = 0;
-            readData = 0;
-            restartMarker = 0;
         }
     }
 }
