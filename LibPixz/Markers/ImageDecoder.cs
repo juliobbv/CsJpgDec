@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Drawing;
 using LibPixz.Colorspaces;
 
@@ -22,143 +23,43 @@ namespace LibPixz.Markers
 
             try
             {
-                // My daily WTF
-                if (imgInfo.components[0].samplingFactorX == 2 &&
-                    imgInfo.components[0].samplingFactorY == 2 &&
-                    imgInfo.components[1].samplingFactorX == 1 &&
-                    imgInfo.components[1].samplingFactorY == 1 &&
-                    imgInfo.components[2].samplingFactorX == 1 &&
-                    imgInfo.components[2].samplingFactorY == 1)
+                var componentMax = imgInfo.components.Aggregate((a, b) =>
                 {
-                    int numTilesX = (imgInfo.width + blkSize * 2 - 1) / (blkSize * 2);
-                    int numTilesY = (imgInfo.height + blkSize * 2 - 1) / (blkSize * 2);
-
-                    for (int y = 0; y < numTilesY; y++)
+                    return new ComponentInfo()
                     {
-                        for (int x = 0; x < numTilesX; x++)
+                        samplingFactorX = Math.Max(a.samplingFactorX, b.samplingFactorX),
+                        samplingFactorY = Math.Max(a.samplingFactorY, b.samplingFactorY)
+                    };
+                });
+
+                int sizeBlockX = blkSize * componentMax.samplingFactorX;
+                int sizeBlockY = blkSize * componentMax.samplingFactorY;
+
+                int numTilesX = (imgInfo.width + sizeBlockX - 1) / sizeBlockX;
+                int numTilesY = (imgInfo.height + sizeBlockY - 1) / sizeBlockY;
+
+                for (int y = 0; y < numTilesY; y++)
+                {
+                    for (int x = 0; x < numTilesX; x++)
+                    {
+                        int ofsX = x * sizeBlockX;
+                        int ofsY = y * sizeBlockY;
+
+                        if (bReader.WasRestartMarkerFound()) ResetDeltas(imgInfo);
+
+                        for (int ch = 0; ch < imgInfo.numOfComponents; ch++)
                         {
-                            int ofsX = x * blkSize * 2;
-                            int ofsY = y * blkSize * 2;
-
-                            if (bReader.WasRestartMarkerFound()) ResetDeltas(imgInfo);
-
-                            try
+                            for (int sy = 0; sy < imgInfo.components[ch].samplingFactorY; sy++)
                             {
-                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY, 1, 1); // Y0
-                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX + blkSize, ofsY, 1, 1); // Y1
-                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY + blkSize, 1, 1); // Y2
-                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX + blkSize, ofsY + blkSize, 1, 1); // Y3
-                            DecodeBlock(bReader, imgInfo, img[1], 1, ofsX, ofsY, 2, 2); // Cb
-                            DecodeBlock(bReader, imgInfo, img[2], 2, ofsX, ofsY, 2, 2); // Cr
-                            }
-                            catch (Exception)
-                            {
-                                throw;
+                                for (int sx = 0; sx < imgInfo.components[ch].samplingFactorX; sx++)
+                                {
+                                    DecodeBlock(bReader, imgInfo, img[ch], ch, ofsX + blkSize * sx, ofsY + blkSize * sy,
+                                        componentMax.samplingFactorX / imgInfo.components[ch].samplingFactorX,
+                                        componentMax.samplingFactorY / imgInfo.components[ch].samplingFactorY);
+                                }
                             }
                         }
                     }
-                }
-                else if (imgInfo.components[0].samplingFactorX == 1 &&
-                         imgInfo.components[0].samplingFactorY == 2 &&
-                         imgInfo.components[1].samplingFactorX == 1 &&
-                         imgInfo.components[1].samplingFactorY == 1 &&
-                         imgInfo.components[2].samplingFactorX == 1 &&
-                         imgInfo.components[2].samplingFactorY == 1)
-                {
-                    int numTilesX = (imgInfo.width + blkSize - 1) / blkSize;
-                    int numTilesY = (imgInfo.height + blkSize * 2 - 1) / (blkSize * 2);
-
-                    for (int y = 0; y < numTilesY; y++)
-                    {
-                        for (int x = 0; x < numTilesX; x++)
-                        {
-                            int ofsX = x * blkSize;
-                            int ofsY = y * blkSize * 2;
-
-                            if (bReader.WasRestartMarkerFound()) ResetDeltas(imgInfo);
-
-                            try
-                            {
-                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY, 1, 1); // Y0
-                            DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY + blkSize, 1, 1); // Y1
-                            DecodeBlock(bReader, imgInfo, img[1], 1, ofsX, ofsY, 1, 2); // Cb
-                            DecodeBlock(bReader, imgInfo, img[2], 2, ofsX, ofsY, 1, 2); // Cr
-                            }
-                            catch (Exception)
-                            {
-                                throw;
-                            }
-                        }
-                    }
-                }
-                else if (imgInfo.components[0].samplingFactorX == 2 &&
-                         imgInfo.components[0].samplingFactorY == 1 &&
-                         imgInfo.components[1].samplingFactorX == 1 &&
-                         imgInfo.components[1].samplingFactorY == 1 &&
-                         imgInfo.components[2].samplingFactorX == 1 &&
-                         imgInfo.components[2].samplingFactorY == 1)
-                {
-                    int numTilesX = (imgInfo.width + blkSize * 2 - 1) / (blkSize * 2);
-                    int numTilesY = (imgInfo.height + blkSize - 1) / blkSize;
-
-                    for (int y = 0; y < numTilesY; y++)
-                    {
-                        for (int x = 0; x < numTilesX; x++)
-                        {
-                            int ofsX = x * blkSize * 2;
-                            int ofsY = y * blkSize;
-
-                            if (bReader.WasRestartMarkerFound()) ResetDeltas(imgInfo);
-
-                            try
-                            {
-                                DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY, 1, 1); // Y0
-                                DecodeBlock(bReader, imgInfo, img[0], 0, ofsX + blkSize, ofsY, 1, 1); // Y1
-                                DecodeBlock(bReader, imgInfo, img[1], 1, ofsX, ofsY, 2, 1); // Cb
-                                DecodeBlock(bReader, imgInfo, img[2], 2, ofsX, ofsY, 2, 1); // Cr
-                            }
-                            catch (Exception)
-                            {
-                                throw;
-                            }
-                        }
-                    }
-                }
-                else if (imgInfo.components[0].samplingFactorX == 1 &&
-                         imgInfo.components[0].samplingFactorY == 1 &&
-                         imgInfo.components[1].samplingFactorX == 1 &&
-                         imgInfo.components[1].samplingFactorY == 1 &&
-                         imgInfo.components[2].samplingFactorX == 1 &&
-                         imgInfo.components[2].samplingFactorY == 1)
-                {
-                    int numTilesX = (imgInfo.width + blkSize - 1) / blkSize;
-                    int numTilesY = (imgInfo.height + blkSize - 1) / blkSize;
-
-                    for (int y = 0; y < numTilesY; y++)
-                    {
-                        for (int x = 0; x < numTilesX; x++)
-                        {
-                            int ofsX = x * blkSize;
-                            int ofsY = y * blkSize;
-
-                            if (bReader.WasRestartMarkerFound()) ResetDeltas(imgInfo);
-
-                            try
-                            {
-                                DecodeBlock(bReader, imgInfo, img[0], 0, ofsX, ofsY, 1, 1); // Y0
-                                DecodeBlock(bReader, imgInfo, img[1], 1, ofsX, ofsY, 1, 1); // Cb
-                                DecodeBlock(bReader, imgInfo, img[2], 2, ofsX, ofsY, 1, 1); // Cr
-                            }
-                            catch (Exception)
-                            {
-                                throw;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    throw new Exception();
                 }
             }
             catch (Exception ex)
