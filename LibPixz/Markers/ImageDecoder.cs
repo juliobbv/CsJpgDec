@@ -46,7 +46,6 @@ namespace LibPixz.Markers
                         int ofsY = y * sizeBlockY;
 
                         if (bReader.WasRestartMarkerFound()) { bReader.Flush(); ResetDeltas(imgInfo); }
-                        if (bReader.PastEndOfFile) { break; }
 
                         for (int ch = 0; ch < imgInfo.numOfComponents; ch++)
                         {
@@ -93,9 +92,18 @@ namespace LibPixz.Markers
                 {
                     Info info;
 
-                    info.a = imgS[0][y, x];
-                    info.b = imgS[1][y, x];
-                    info.c = imgS[2][y, x];
+                    if (imgInfo.numOfComponents == 1) // Y
+                    {
+                        info.a = imgS[0][y, x];
+                        info.b = 0;
+                        info.c = 0;
+                    }
+                    else // YCbCr
+                    {
+                        info.a = imgS[0][y, x];
+                        info.b = imgS[1][y, x];
+                        info.c = imgS[2][y, x];
+                    }
 
                     img[y, x] = converter.ConvertToRgb(info);
                 }

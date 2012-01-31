@@ -15,7 +15,7 @@ namespace LibPixz.Markers
             Logger.WriteLine("Found at: " + reader.BaseStream.Position.ToString("X"));
             Logger.WriteLine();
 
-            if (imgInfo.numOfComponents != 3)
+            if (imgInfo.numOfComponents != 1 && imgInfo.numOfComponents != 3)
                 throw new Exception("Unsupported format");
 
             ushort length = reader.ReadBEUInt16();
