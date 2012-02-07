@@ -61,7 +61,7 @@ namespace LibPixz.Markers
                         }
                     }
 
-                    if (bReader.PastEndOfFile) { break;  }
+                    if (bReader.PastEndOfFile) { break; }
                 }
             }
             catch (Exception ex)

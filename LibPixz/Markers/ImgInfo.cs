@@ -12,6 +12,7 @@ namespace LibPixz
         public byte dataPrecision;
         public ushort height;
         public ushort width;
+        public ushort restartInterval;
         public byte numOfComponents;
         public ComponentInfo[] components;
 

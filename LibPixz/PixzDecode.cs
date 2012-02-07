@@ -23,6 +23,7 @@ namespace LibPixz
             Rs7 = 0xd7,
             Sos = 0xda,
             Eoi = 0xd9,
+            Dri = 0xdd
         }
 
         public static List<Bitmap> Decode(string path)
@@ -72,6 +73,9 @@ namespace LibPixz
                                 Logger.Write("Start of Image " + image);
                                 Logger.WriteLine(" at: " + reader.BaseStream.Position.ToString("X"));
                                 break;
+                            case MarkersId.Dri:
+                                Dri.Read(reader, imgInfo);
+                                break;
                             case MarkersId.Eoi:
                                 eof = true;
                                 break;
@@ -99,7 +103,6 @@ namespace LibPixz
             reader.Close();
             Logger.Flush();
 
-            //bmp.Save("C:\\progress1.png");
             return images;
         }
 
