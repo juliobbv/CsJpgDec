@@ -38,25 +38,22 @@ namespace LibPixz.Markers
                 int numTilesX = (imgInfo.width + sizeBlockX - 1) / sizeBlockX;
                 int numTilesY = (imgInfo.height + sizeBlockY - 1) / sizeBlockY;
 
-                for (int y = 0; y < numTilesY; y++)
+                for (int mcu = 0; mcu < numTilesX * numTilesY; mcu = NextMcuPos(imgInfo, bReader, mcu))
                 {
-                    for (int x = 0; x < numTilesX; x++)
+                    int mcuX = mcu % numTilesX;
+                    int mcuY = mcu / numTilesX;
+                    int ofsX = mcuX * sizeBlockX;
+                    int ofsY = mcuY * sizeBlockY;
+
+                    for (int ch = 0; ch < imgInfo.numOfComponents; ch++)
                     {
-                        int ofsX = x * sizeBlockX;
-                        int ofsY = y * sizeBlockY;
-
-                        if (bReader.WasRestartMarkerFound()) { bReader.Flush(); ResetDeltas(imgInfo); }
-
-                        for (int ch = 0; ch < imgInfo.numOfComponents; ch++)
+                        for (int sy = 0; sy < imgInfo.components[ch].samplingFactorY; sy++)
                         {
-                            for (int sy = 0; sy < imgInfo.components[ch].samplingFactorY; sy++)
+                            for (int sx = 0; sx < imgInfo.components[ch].samplingFactorX; sx++)
                             {
-                                for (int sx = 0; sx < imgInfo.components[ch].samplingFactorX; sx++)
-                                {
-                                    DecodeBlock(bReader, imgInfo, img[ch], ch, ofsX + blkSize * sx, ofsY + blkSize * sy,
-                                        componentMax.samplingFactorX / imgInfo.components[ch].samplingFactorX,
-                                        componentMax.samplingFactorY / imgInfo.components[ch].samplingFactorY);
-                                }
+                                DecodeBlock(bReader, imgInfo, img[ch], ch, ofsX + blkSize * sx, ofsY + blkSize * sy,
+                                    componentMax.samplingFactorX / imgInfo.components[ch].samplingFactorX,
+                                    componentMax.samplingFactorY / imgInfo.components[ch].samplingFactorY);
                             }
                         }
                     }
@@ -79,6 +76,34 @@ namespace LibPixz.Markers
             conv.SetImage(imagen);
 
             return bmp;
+        }
+
+        protected static int NextMcuPos(ImgInfo imgInfo, BitReader bReader, int mcu)
+        {
+            if (imgInfo.hasRestartMarkers)
+            {
+                if ((mcu % imgInfo.restartInterval) == imgInfo.restartInterval - 1)
+                {
+                    Pixz.MarkersId currRestMarker = bReader.SyncStreamToNextRestartMarker();
+                    int difference = currRestMarker - imgInfo.prevRestMarker;
+
+                    if (difference <= 0) difference += Dri.RestartMarkerPeriod;
+
+                    ResetDeltas(imgInfo);
+                    imgInfo.mcuStrip += difference;
+                    imgInfo.prevRestMarker = currRestMarker;
+
+                    return imgInfo.mcuStrip * imgInfo.restartInterval;
+                }
+                else
+                {
+                    return ++mcu;
+                }
+            }
+            else
+            {
+                return ++mcu; 
+            }
         }
 
         protected static Color[,] UnirCanales(ImgInfo imgInfo, float[][,] imgS)

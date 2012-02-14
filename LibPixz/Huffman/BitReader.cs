@@ -73,7 +73,7 @@ namespace LibPixz
                 {
                     while (availableBits <= length)
                     {
-                        // Restart markers count as a virtual "barrier" when reading from the stream
+                        // Restart markers block reads from the stream until we call flush
                         if (restartMarker != 0) break;
 
                         nextChunk = ReadByteNonStuffed();
@@ -150,15 +150,6 @@ namespace LibPixz
             restartMarker = 0;
         }
 
-        /// <summary>
-        /// Checks if a restart marker was found in a stream
-        /// </summary>
-        /// <returns></returns>
-        public bool WasRestartMarkerFound()
-        {
-            return restartMarker != 0;
-        }
-
         private byte ReadByteNonStuffed()
         {
             byte number = reader.ReadByte();
@@ -174,6 +165,7 @@ namespace LibPixz
                 else if (markerValue >= (int)Pixz.MarkersId.Rs0 && markerValue <= (int)Pixz.MarkersId.Rs7)
                 {
                     restartMarker = markerValue;
+
                     return 0;
                 }
                 else
@@ -185,6 +177,23 @@ namespace LibPixz
             {
                 return number;
             }
+        }
+
+        /// <summary>
+        /// Finds the next restart marker
+        /// </summary>
+        /// <returns>The next restart marker</returns>
+        public Pixz.MarkersId SyncStreamToNextRestartMarker()
+        {
+            while (restartMarker == 0)
+            {
+                ReadByteNonStuffed();
+            }
+
+            byte restartM = restartMarker;
+            Flush();
+
+            return (Pixz.MarkersId)restartM;
         }
     }
 }
