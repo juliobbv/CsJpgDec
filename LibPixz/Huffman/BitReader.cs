@@ -116,7 +116,7 @@ namespace LibPixz
             availableBits -= (int)length;
 
             int shift = (int)(dataSize * 2 - availableBits);
-            // We move data left and right in order to get only the bits we require
+            // We move data to the left and then right in order to get only the bits we require
             readData <<= shift;
             readData >>= shift;
 
@@ -130,9 +130,9 @@ namespace LibPixz
         {
             if (!dataPad)
             {
-                // Rewind all (whole) bytes we didn't use
-                int rewind = availableBits / sizeof(byte);
-
+                // Rewind all (whole) bytes we didn't use (including 2 from eof marker)
+                // ToDo: check if this is correct
+                int rewind = ((availableBits + readerSize - 1) / readerSize) + 2;
                 reader.BaseStream.Seek(-rewind, SeekOrigin.Current);
             }
 

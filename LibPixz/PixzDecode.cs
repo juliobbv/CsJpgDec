@@ -77,6 +77,8 @@ namespace LibPixz
                                 Dri.Read(reader, imgInfo);
                                 break;
                             case MarkersId.Eoi:
+                                Logger.Write("End of Image " + image);
+                                Logger.WriteLine(" at: " + reader.BaseStream.Position.ToString("X"));
                                 eof = true;
                                 break;
                             // Unknown markers, or markers used outside of their specified area

@@ -90,9 +90,9 @@ namespace LibPixz
             Color[,] imagen = new Color[height, width];
 
             this.LockImage();
-            for (int y = 0; y < Height; y++)
+            for (int y = 0; y < height; y++)
             {
-                for (int x = 0; x < Width; x++)
+                for (int x = 0; x < width; x++)
                 {
                     imagen[y, x] = this.GetPixel(x, y);
                 }
@@ -106,9 +106,9 @@ namespace LibPixz
         {
             this.LockImage();
 
-            for (int y = 0; y < Height; y++)
+            for (int y = 0; y < height; y++)
             {
-                for (int x = 0; x < Width; x++)
+                for (int x = 0; x < width; x++)
                 {
                     this.SetPixel(x, y, imagen[y, x]);
                 }

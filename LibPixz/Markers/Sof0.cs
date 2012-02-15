@@ -8,6 +8,7 @@ namespace LibPixz.Markers
 {
     public struct ComponentInfo
     {
+        public byte id;
         public byte samplingFactorX;
         public byte samplingFactorY;
         public byte quantTableId;
@@ -45,17 +46,18 @@ namespace LibPixz.Markers
 
             for (int i = 0; i < imgInfo.numOfComponents; i++)
             {
-                byte id = (byte)(reader.ReadByte() - 1);
+                byte id = reader.ReadByte();
 
-                if (id > 2)
+                if (id > 3)
                     throw new Exception("Invalid component type");
 
                 byte samplingFactor = reader.ReadByte();
 
-                imgInfo.components[id].samplingFactorX = (byte)(samplingFactor >> 4);
-                imgInfo.components[id].samplingFactorY = (byte)(samplingFactor & 0x0f);
+                imgInfo.components[i].id = id;
+                imgInfo.components[i].samplingFactorX = (byte)(samplingFactor >> 4);
+                imgInfo.components[i].samplingFactorY = (byte)(samplingFactor & 0x0f);
 
-                imgInfo.components[id].quantTableId = reader.ReadByte();
+                imgInfo.components[i].quantTableId = reader.ReadByte();
             }
 
             Log(reader, imgInfo);
@@ -73,6 +75,7 @@ namespace LibPixz.Markers
             for (int i = 0; i < imgInfo.numOfComponents; i++)
             {
                 Logger.WriteLine("Component " + i);
+                Logger.WriteLine("ID: " + imgInfo.components[i].id);
                 Logger.WriteLine("Sampling Factor X: " + imgInfo.components[i].samplingFactorX);
                 Logger.WriteLine("Sampling Factor Y: " + imgInfo.components[i].samplingFactorY);
             }
