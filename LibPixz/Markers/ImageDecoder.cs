@@ -35,13 +35,15 @@ namespace LibPixz.Markers
                 int sizeBlockX = blkSize * componentMax.samplingFactorX;
                 int sizeBlockY = blkSize * componentMax.samplingFactorY;
 
-                int numTilesX = (imgInfo.width + sizeBlockX - 1) / sizeBlockX;
-                int numTilesY = (imgInfo.height + sizeBlockY - 1) / sizeBlockY;
+                int numMcusX = (imgInfo.width + sizeBlockX - 1) / sizeBlockX;
+                int numMcusY = (imgInfo.height + sizeBlockY - 1) / sizeBlockY;
 
-                for (int mcu = 0; mcu < numTilesX * numTilesY; mcu = NextMcuPos(imgInfo, bReader, mcu))
+                for (int mcu = 0; mcu < numMcusX * numMcusY; mcu = NextMcuPos(imgInfo, bReader, mcu))
                 {
-                    int mcuX = mcu % numTilesX;
-                    int mcuY = mcu / numTilesX;
+                    // X and Y coordinates of current MCU
+                    int mcuX = mcu % numMcusX;
+                    int mcuY = mcu / numMcusX;
+                    // Starting X and Y pixels of current MCU
                     int ofsX = mcuX * sizeBlockX;
                     int ofsY = mcuY * sizeBlockY;
 
@@ -72,7 +74,6 @@ namespace LibPixz.Markers
             BmpData conv = new BmpData(bmp);
 
             bReader.StopReading();
-
             conv.SetImage(imagen);
 
             return bmp;
@@ -80,6 +81,9 @@ namespace LibPixz.Markers
 
         protected static int NextMcuPos(ImgInfo imgInfo, BitReader bReader, int mcu)
         {
+            // If we are expecting a restart marker, find it in the stream,
+            // reset the DC prediction variables and calculate the new MCU position
+            // otherwise, just increment the position by one
             if (imgInfo.hasRestartMarkers &&
                (mcu % imgInfo.restartInterval) == imgInfo.restartInterval - 1)
             {
@@ -98,7 +102,7 @@ namespace LibPixz.Markers
             {
                 return ++mcu;
             }
-        }
+        }   
 
         protected static Color[,] MergeChannels(ImgInfo imgInfo, float[][,] imgS)
         {

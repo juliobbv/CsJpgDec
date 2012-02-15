@@ -48,14 +48,14 @@
             this.btnAbrir.Name = "btnAbrir";
             this.btnAbrir.Size = new System.Drawing.Size(149, 70);
             this.btnAbrir.TabIndex = 0;
-            this.btnAbrir.Text = "Abrir Imagen";
+            this.btnAbrir.Text = "Abrir Archivo";
             this.btnAbrir.UseVisualStyleBackColor = true;
             this.btnAbrir.Click += new System.EventHandler(this.btnAbrir_Click);
             // 
             // pbxOriginal
             // 
             this.pbxOriginal.Location = new System.Drawing.Point(0, 0);
-            this.pbxOriginal.Margin = new System.Windows.Forms.Padding(0, 0, 0, 0);
+            this.pbxOriginal.Margin = new System.Windows.Forms.Padding(0);
             this.pbxOriginal.Name = "pbxOriginal";
             this.pbxOriginal.Size = new System.Drawing.Size(744, 472);
             this.pbxOriginal.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;

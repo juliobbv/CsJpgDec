@@ -31,13 +31,20 @@ namespace PixzGui
 
                     Stopwatch watch = new Stopwatch();
 
-                    if (Path.GetExtension(dialogo.FileName).ToLower() == ".jpg")
+                    //if (Path.GetExtension(dialogo.FileName).ToLower() == ".jpg")
                     {
                         watch.Start();
                         images = Pixz.Decode(dialogo.FileName);
                         watch.Stop();
 
                         lblTiempo.Text = watch.ElapsedMilliseconds / 1000.0 + " s";
+
+                        if (images.Count == 0)
+                        {
+                            MessageBox.Show("No se encontraron imágenes en el archivo");
+                            return;
+                        }
+
                         pbxOriginal.Image = images[0];
 
                         nudImagen.Value = 0;
