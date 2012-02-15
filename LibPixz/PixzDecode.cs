@@ -13,7 +13,7 @@ namespace LibPixz
     {
         public enum MarkersId
         {
-            Literal255 = 0x00,
+            LiteralFF = 0x00,
             Soi = 0xd8,
             App0 = 0xe0,
             Dqt = 0xdb,

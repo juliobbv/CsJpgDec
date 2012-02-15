@@ -13,10 +13,10 @@ namespace LibPixz.Markers
             Logger.Write("Unknown marker (" + markerId.ToString("X") + ")");
             Logger.WriteLine(" at: " + reader.BaseStream.Position.ToString("X"));
 
-            // Check if marker is not followed by a length
+            // Check if marker is not followed by a length argument
             if (markerId >= Pixz.MarkersId.Rs0 && markerId <= Pixz.MarkersId.Rs7)
                 return;
-            if (markerId == Pixz.MarkersId.Literal255)
+            if (markerId == Pixz.MarkersId.LiteralFF)
                 return;
 
             ushort length = reader.ReadBEUInt16();

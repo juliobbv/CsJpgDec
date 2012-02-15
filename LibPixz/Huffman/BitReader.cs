@@ -11,12 +11,12 @@ namespace LibPixz
     /// </summary>
     public class BitReader
     {
-        const uint dataSize = sizeof(ushort) * 8;
-        const uint readerSize = sizeof(byte) * 8;
+        const int dataSize = sizeof(ushort) * 8;
+        const int readerSize = sizeof(byte) * 8;
 
         BinaryReader reader;
         uint readData;
-        uint availableBits;
+        int availableBits;
         bool dataPad;
         byte restartMarker;
 
@@ -33,7 +33,7 @@ namespace LibPixz
         /// </summary>
         public bool PastEndOfFile
         {
-            get { return dataPad; }
+            get { return dataPad && availableBits <= 0; }
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace LibPixz
 
             ushort data = Peek(length);
 
-            availableBits -= length;
+            availableBits -= (int)length;
 
             int shift = (int)(dataSize * 2 - availableBits);
             // We move data left and right in order to get only the bits we require
@@ -131,7 +131,7 @@ namespace LibPixz
             if (!dataPad)
             {
                 // Rewind all (whole) bytes we didn't use
-                uint rewind = availableBits / sizeof(byte);
+                int rewind = availableBits / sizeof(byte);
 
                 reader.BaseStream.Seek(-rewind, SeekOrigin.Current);
             }

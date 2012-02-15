@@ -58,7 +58,7 @@ namespace LibPixz.Markers
                         }
                     }
 
-                    if (bReader.PastEndOfFile) { break; }
+                    if (bReader.PastEndOfFile) break;
                 }
             }
             catch (Exception ex)
@@ -67,7 +67,7 @@ namespace LibPixz.Markers
                 Logger.WriteLine(ex.StackTrace);
             }
 
-            Color[,] imagen = UnirCanales(imgInfo, img);
+            Color[,] imagen = MergeChannels(imgInfo, img);
             Bitmap bmp = new Bitmap(imgInfo.width, imgInfo.height);
             BmpData conv = new BmpData(bmp);
 
@@ -80,33 +80,27 @@ namespace LibPixz.Markers
 
         protected static int NextMcuPos(ImgInfo imgInfo, BitReader bReader, int mcu)
         {
-            if (imgInfo.hasRestartMarkers)
+            if (imgInfo.hasRestartMarkers &&
+               (mcu % imgInfo.restartInterval) == imgInfo.restartInterval - 1)
             {
-                if ((mcu % imgInfo.restartInterval) == imgInfo.restartInterval - 1)
-                {
-                    Pixz.MarkersId currRestMarker = bReader.SyncStreamToNextRestartMarker();
-                    int difference = currRestMarker - imgInfo.prevRestMarker;
+                Pixz.MarkersId currRestMarker = bReader.SyncStreamToNextRestartMarker();
+                int difference = currRestMarker - imgInfo.prevRestMarker;
 
-                    if (difference <= 0) difference += Dri.RestartMarkerPeriod;
+                if (difference <= 0) difference += Dri.RestartMarkerPeriod;
 
-                    ResetDeltas(imgInfo);
-                    imgInfo.mcuStrip += difference;
-                    imgInfo.prevRestMarker = currRestMarker;
+                ResetDeltas(imgInfo);
+                imgInfo.mcuStrip += difference;
+                imgInfo.prevRestMarker = currRestMarker;
 
-                    return imgInfo.mcuStrip * imgInfo.restartInterval;
-                }
-                else
-                {
-                    return ++mcu;
-                }
+                return imgInfo.mcuStrip * imgInfo.restartInterval;
             }
             else
             {
-                return ++mcu; 
+                return ++mcu;
             }
         }
 
-        protected static Color[,] UnirCanales(ImgInfo imgInfo, float[][,] imgS)
+        protected static Color[,] MergeChannels(ImgInfo imgInfo, float[][,] imgS)
         {
             Color[,] img = new Color[imgInfo.height, imgInfo.width];
             var converter = new Colorspaces.YCbCr();
@@ -142,7 +136,7 @@ namespace LibPixz.Markers
         {
             int quantIndex = imgInfo.components[compIndex].quantTableId;
 
-            short[] coefZig = ObtenerCoef(bReader, imgInfo, compIndex, blkSize * blkSize);
+            short[] coefZig = GetCoefficients(bReader, imgInfo, compIndex, blkSize * blkSize);
             short[,] coefDctB = FileOps.ZigZagToArray(coefZig, FileOps.tablasZigzag[blkSize], blkSize);
             float[,] coefDct = ImgOps.Dequant(coefDctB, imgInfo.quantTables[quantIndex].table, blkSize);
             float[,] imgP = ImgOps.Dct(coefDct, blkSize, blkSize, true);
@@ -170,7 +164,7 @@ namespace LibPixz.Markers
             }
         }
 
-        protected static short[] ObtenerCoef(BitReader bReader, ImgInfo imgInfo, int compIndex, int numCoefs)
+        protected static short[] GetCoefficients(BitReader bReader, ImgInfo imgInfo, int compIndex, int numCoefs)
         {
             var coefZig = new short[numCoefs];
             int acIndex = imgInfo.components[compIndex].acHuffmanTable;
