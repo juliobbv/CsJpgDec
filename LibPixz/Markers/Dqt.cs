@@ -15,10 +15,13 @@ namespace LibPixz.Markers
         public ushort[] table;
     }
 
-    class Dqt
+    class Dqt : Marker
     {
+        static string name = "DQT";
+
         public static void Read(BinaryReader reader, ImgInfo imgInfo)
         {
+            LogMarker(reader, name);
             int markerLength = reader.ReadBEUInt16() - 2;
 
             while (markerLength > 0)
@@ -30,10 +33,6 @@ namespace LibPixz.Markers
 
         public static int ReadTable(BinaryReader reader, ImgInfo imgInfo)
         {
-            Logger.WriteLine("---DQT---");
-            Logger.WriteLine("Found at: " + reader.BaseStream.Position.ToString("X"));
-            Logger.WriteLine();
-
             byte tableInfo = reader.ReadByte();
             byte tableId = (byte)(tableInfo & 0xf); // Low 4 bits of tableInfo
 

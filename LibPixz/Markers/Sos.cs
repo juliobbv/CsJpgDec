@@ -7,13 +7,13 @@ using System.Drawing;
 
 namespace LibPixz.Markers
 {
-    class Sos
+    class Sos : Marker
     {
+        static string name = "SOS";
+
         public static Bitmap Read(BinaryReader reader, ImgInfo imgInfo)
         {
-            Logger.WriteLine("---SOS---");
-            Logger.WriteLine("Found at: " + reader.BaseStream.Position.ToString("X"));
-            Logger.WriteLine();
+            LogMarker(reader, name);
 
             if (imgInfo.numOfComponents != 1 && imgInfo.numOfComponents != 3)
                 throw new Exception("Unsupported format");

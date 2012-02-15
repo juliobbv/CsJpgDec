@@ -19,8 +19,8 @@ namespace LibPixz
             Dqt = 0xdb,
             Sof0 = 0xc0,
             Dht = 0xc4,
-            Rs0 = 0xd0,
-            Rs7 = 0xd7,
+            Rs0 = 0xd0, Rs1 = 0xd1, Rs2 = 0xd2, Rs3 = 0xd3,
+            Rs4 = 0xd4, Rs5 = 0xd5, Rs6 = 0xd6, Rs7 = 0xd7,
             Sos = 0xda,
             Eoi = 0xd9,
             Dri = 0xdd
@@ -79,11 +79,9 @@ namespace LibPixz
                             case MarkersId.Eoi:
                                 eof = true;
                                 break;
-                            case MarkersId.Literal255:
-                                break;
+                            // Unknown markers, or markers used outside of their specified area
                             default:
-                                Logger.Write("Unknown marker (" + markerId.ToString("X") + ")");
-                                Logger.WriteLine(" at: " + reader.BaseStream.Position.ToString("X"));
+                                Default.Read(reader, imgInfo, (MarkersId)markerId);
                                 break;
                         }
 

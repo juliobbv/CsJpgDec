@@ -15,13 +15,13 @@ namespace LibPixz.Markers
         public byte acHuffmanTable;
     }
 
-    class Sof0
+    class Sof0 : Marker
     {
+        static string name = "SOF0";
+
         public static void Read(BinaryReader reader, ImgInfo imgInfo)
         {
-            Logger.WriteLine("---SOF0---");
-            Logger.WriteLine("Found at: " + reader.BaseStream.Position.ToString("X"));
-            Logger.WriteLine();
+            LogMarker(reader, name);
 
             imgInfo.length = reader.ReadBEUInt16();
             imgInfo.dataPrecision = reader.ReadByte();

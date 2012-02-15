@@ -14,15 +14,19 @@ namespace LibPixz.Markers
         public byte[] numSymbols;
         public byte[] codes;
 
+        // Helper variables for image decoding
         public byte maxCodeLength;
         public List<Huffman.CodeInfo> table;
         public Huffman.CodeInfo[] preIndexTable;
     }
 
-    class Dht
+    class Dht : Marker
     {
+        static string name = "DHT";
+
         public static void Read(BinaryReader reader, ImgInfo imgInfo)
         {
+            LogMarker(reader, name);
             int markerLength = reader.ReadBEUInt16() - 2;
 
             while (markerLength > 0)
@@ -34,10 +38,6 @@ namespace LibPixz.Markers
 
         public static int ReadTable(BinaryReader reader, ImgInfo imgInfo)
         {
-            Logger.WriteLine("---DHT---");
-            Logger.WriteLine("Found at: " + reader.BaseStream.Position.ToString("X"));
-            Logger.WriteLine();
-
             byte tableInfo = reader.ReadByte();
             byte tableId = (byte)(tableInfo & 0x7); // Low 3 bits of tableInfo
             int numCodes = 0;

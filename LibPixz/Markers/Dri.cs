@@ -6,15 +6,14 @@ using System.IO;
 
 namespace LibPixz.Markers
 {
-    class Dri
+    class Dri : Marker
     {
         public const int RestartMarkerPeriod = 8;
+        static string name = "DRI";
 
         public static void Read(BinaryReader reader, ImgInfo imgInfo)
         {
-            Logger.WriteLine("---DRI---");
-            Logger.WriteLine("Found at: " + reader.BaseStream.Position.ToString("X"));
-            Logger.WriteLine();
+            LogMarker(reader, name);
 
             int length = reader.ReadBEUInt16();
 
