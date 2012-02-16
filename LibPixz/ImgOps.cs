@@ -322,26 +322,33 @@ namespace LibPixz
                 coefDct[tam - 1, x] = 96f;
         }
 
-        protected internal static float[,] NearestNeighborResize(float[,] img, int width, int height, int scaleX, int scaleY)
+        protected internal static void ResizeAndInsertBlock(ImgInfo imgInfo, float[,] block, float[,] imagen, int tamX, int tamY, int ofsX, int ofsY, int scaleX, int scaleY)
         {
-            float[,] output = new float[height * scaleY, width * scaleX];
+            // Nearest neighbor interpolation
 
             // For staircase FTW
-            for (int j = 0; j < height; j++)
+            if (ofsX < imgInfo.width && ofsY < imgInfo.height)
             {
-                for (int i = 0; i < width; i++)
+                for (int j = 0; j < tamY; j++)
                 {
-                    for (int jj = 0; jj < scaleY; jj++)
+                    for (int i = 0; i < tamX; i++)
                     {
-                        for (int ii = 0; ii < scaleX; ii++)
+                        for (int jj = 0; jj < scaleY; jj++)
                         {
-                            output[j * scaleY + jj, i * scaleX + ii] = img[j, i];
+                            for (int ii = 0; ii < scaleX; ii++)
+                            {
+                                int posYimg = j * scaleY + ofsY + jj;
+                                int posXimg = i * scaleX + ofsX + ii;
+
+                                if (posYimg < imgInfo.height && posXimg < imgInfo.width)
+                                {
+                                    imagen[posYimg, posXimg] = block[j, i];
+                                }
+                            }
                         }
                     }
                 }
             }
-
-            return output;
         }
     }
 }

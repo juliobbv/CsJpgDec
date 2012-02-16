@@ -143,29 +143,9 @@ namespace LibPixz.Markers
             short[] coefZig = GetCoefficients(bReader, imgInfo, compIndex, blkSize * blkSize);
             short[,] coefDctB = FileOps.ZigZagToArray(coefZig, FileOps.tablasZigzag[blkSize], blkSize);
             float[,] coefDct = ImgOps.Dequant(coefDctB, imgInfo.quantTables[quantIndex].table, blkSize);
-            float[,] imgP = ImgOps.Dct(coefDct, blkSize, blkSize, true);
+            float[,] blockP = ImgOps.Dct(coefDct, blkSize, blkSize, true);
 
-            if (scaleX != 1 || scaleY != 1)
-                imgP = ImgOps.NearestNeighborResize(imgP, blkSize, blkSize, scaleX, scaleY);
-
-            InsertBlockInImage(imgInfo, img, imgP, blkSize * scaleX, blkSize * scaleY, ofsX, ofsY);
-        }
-
-        protected static void InsertBlockInImage(ImgInfo imgInfo, float[,] imagen, float[,] bloque, int tamX, int tamY, int ofsX, int ofsY)
-        {
-            int finX = ofsX + tamX > imgInfo.width ? imgInfo.width % tamX : tamX;
-            int finY = ofsY + tamY > imgInfo.height ? imgInfo.height % tamY : tamY;
-
-            if (ofsX < imgInfo.width && ofsY < imgInfo.height)
-            {
-                for (int j = 0; j < finY; j++)
-                {
-                    for (int i = 0; i < finX; i++)
-                    {
-                        imagen[j + ofsY, i + ofsX] = bloque[j, i];
-                    }
-                }
-            }
+            ImgOps.ResizeAndInsertBlock(imgInfo, blockP, img, blkSize, blkSize, ofsX, ofsY, scaleX, scaleY);
         }
 
         protected static short[] GetCoefficients(BitReader bReader, ImgInfo imgInfo, int compIndex, int numCoefs)
