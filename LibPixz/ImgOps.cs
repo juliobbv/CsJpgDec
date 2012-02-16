@@ -8,8 +8,6 @@ namespace LibPixz
 {
     unsafe public partial class ImgOps
     {
-        public static Dictionary<int, float[,]> tablaCosActual;
-
         public static Dictionary<int, float[,]> tablasCos = new Dictionary<int, float[,]>()
         {
             { 1, GetTablaCos(1) },
@@ -255,14 +253,13 @@ namespace LibPixz
             return bloqueDct;
         }
 
-        protected internal static float[,] Dct(float[,] bloque, int tamX, int tamY, bool inversa = false)
+        protected internal static void Dct(float[,] bloque, float[,] bloqueDct, int tamX, int tamY)
         {
             int u, v, x, y;
             float suma, suma2;
-            float[,] bloqueDct = new float[tamY, tamX];
 
-            float[,] tCosXU = inversa ? tablasICos[tamX] : tablasCos[tamX];
-            float[,] tCosYV = inversa ? tablasICos[tamY] : tablasCos[tamY];
+            float[,] tCosXU = tablasCos[tamX];
+            float[,] tCosYV = tablasCos[tamY];
 
             for (v = 0; v < tamY; v++)
             {
@@ -280,8 +277,32 @@ namespace LibPixz
                     bloqueDct[v, u] = (float)(Math.Round(suma2));
                 }
             }
+        }
 
-            return bloqueDct;
+        protected internal static void Idct(float[,] bloque, float[,] bloqueDct, int tamX, int tamY)
+        {
+            int u, v, x, y;
+            float suma, suma2;
+
+            float[,] tCosXU = tablasICos[tamX];
+            float[,] tCosYV = tablasICos[tamY];
+
+            for (v = 0; v < tamY; v++)
+            {
+                for (u = 0; u < tamX; u++)
+                {
+                    for (y = 0, suma2 = 0; y < tamY; y++)
+                    {
+                        for (x = 0, suma = 0; x < tamX; x++)
+                        {
+                            suma += (bloque[y, x]) * tCosXU[x, u];
+                        }
+
+                        suma2 += suma * tCosYV[y, v];
+                    }
+                    bloqueDct[v, u] = (float)(Math.Round(suma2));
+                }
+            }
         }
 
         protected internal static float[,] DctP(float[,] bloque, int tamX, int tamY, bool inversa = false)
@@ -325,7 +346,6 @@ namespace LibPixz
         protected internal static void ResizeAndInsertBlock(ImgInfo imgInfo, float[,] block, float[,] imagen, int tamX, int tamY, int ofsX, int ofsY, int scaleX, int scaleY)
         {
             // Nearest neighbor interpolation
-
             // For staircase FTW
             if (ofsX < imgInfo.width && ofsY < imgInfo.height)
             {

@@ -24,19 +24,15 @@ namespace LibPixz
             return pixQnt;
         }
 
-        protected internal static float[,] Dequant(short[,] pixQnt, ushort[] matriz, int tam)
+        protected internal static void Dequant(short[,] pixQnt, float[,] coefDct, ushort[] matriz, int tam)
         {
-            float[,] pixDct = new float[tam, tam];
-
             for (int y = 0; y < tam; y++)
             {
                 for (int x = 0; x < tam; x++)
                 {
-                    pixDct[y, x] = (float)(pixQnt[y, x] * matriz[y * tam + x]);
+                    coefDct[y, x] = (float)(pixQnt[y, x] * matriz[y * tam + x]);
                 }
             }
-
-            return pixDct;
         }
     }
 }

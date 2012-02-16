@@ -24,7 +24,7 @@ namespace PixzCli
         {
             try
             {
-                DirectoryInfo info = new DirectoryInfo(@"C:\Users\Julio\Dropbox\Pixz\Pics");
+                DirectoryInfo info = new DirectoryInfo(@"C:\Users\Julio\Dropbox\CsJpgDec\Pics");
                 Stopwatch watch = new Stopwatch();
 
                 watch.Start();

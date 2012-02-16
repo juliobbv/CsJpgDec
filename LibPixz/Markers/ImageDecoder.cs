@@ -11,6 +11,10 @@ namespace LibPixz.Markers
     {
         const int blkSize = 8;
 
+        protected static float[,] blockP = new float[blkSize, blkSize];
+        protected static short[,] coefDctQnt = new short[blkSize, blkSize];
+        protected static float[,] coefDct = new float[blkSize, blkSize];
+
         protected internal static Bitmap DecodeImage(BinaryReader reader, ImgInfo imgInfo)
         {
             BitReader bReader = new BitReader(reader);
@@ -141,9 +145,9 @@ namespace LibPixz.Markers
             int quantIndex = imgInfo.components[compIndex].quantTableId;
 
             short[] coefZig = GetCoefficients(bReader, imgInfo, compIndex, blkSize * blkSize);
-            short[,] coefDctB = FileOps.ZigZagToArray(coefZig, FileOps.tablasZigzag[blkSize], blkSize);
-            float[,] coefDct = ImgOps.Dequant(coefDctB, imgInfo.quantTables[quantIndex].table, blkSize);
-            float[,] blockP = ImgOps.Dct(coefDct, blkSize, blkSize, true);
+            FileOps.ZigZagToArray(coefZig, coefDctQnt, FileOps.tablasZigzag[blkSize], blkSize);
+            ImgOps.Dequant(coefDctQnt, coefDct, imgInfo.quantTables[quantIndex].table, blkSize);
+            ImgOps.Idct(coefDct, blockP, blkSize, blkSize);
 
             ImgOps.ResizeAndInsertBlock(imgInfo, blockP, img, blkSize, blkSize, ofsX, ofsY, scaleX, scaleY);
         }

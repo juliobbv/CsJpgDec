@@ -66,17 +66,14 @@ namespace LibPixz
             return coefZig;
         }
 
-        protected internal static short[,] ZigZagToArray(short[] coefZig, Point[] order, int size)
+        protected internal static void ZigZagToArray(short[] coefZig, short[,] coefDct, Point[] order, int size)
         {
             int numElem = size * size;
-            short[,] coefDct = new short[size, size];
 
             for (int i = 0; i < numElem; i++)
             {
                 coefDct[order[i].Y, order[i].X] = coefZig[i];
             }
-
-            return coefDct;
         }
     }
 }
