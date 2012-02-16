@@ -22,7 +22,7 @@ namespace LibPixz.Colorspaces
             {  1f,  1.772f,    0f       }
         };
 
-        public Color ConvertToRgb(Info info)
+        public Color2 ConvertToRgb(Info info)
         {
             byte r, g, b;
             float y  = info.a + 128;
@@ -33,22 +33,22 @@ namespace LibPixz.Colorspaces
             g = (byte)Common.Clamp(y + cb * mYcbcrRgb[1, 1] + cr * mYcbcrRgb[1, 2], 0, 255);
             b = (byte)Common.Clamp(y + cb * mYcbcrRgb[2, 1]                       , 0, 255);
 
-            return Color.FromArgb(r, g, b);
+            return new Color2() { a = 255, r = r, g = g, b = b };
         }
 
-        public Info ConvertFromRgb(System.Drawing.Color rgb)
+        public Info ConvertFromRgb(Color2 rgb)
         {
-            Info ycbcr;
+            Info yCbCr;
 
             // Valores YCbCr
-            ycbcr.a = rgb.R * mRgbYcbcr[0, 0] + rgb.G * mRgbYcbcr[0, 1] + rgb.B * mRgbYcbcr[0, 2] - 128;
-            ycbcr.b = rgb.R * mRgbYcbcr[1, 0] + rgb.G * mRgbYcbcr[1, 1] + rgb.B * mRgbYcbcr[1, 2];
-            ycbcr.c = rgb.R * mRgbYcbcr[2, 0] + rgb.G * mRgbYcbcr[2, 1] + rgb.B * mRgbYcbcr[2, 2];
+            yCbCr.a = rgb.r * mRgbYcbcr[0, 0] + rgb.g * mRgbYcbcr[0, 1] + rgb.b * mRgbYcbcr[0, 2] - 128;
+            yCbCr.b = rgb.r * mRgbYcbcr[1, 0] + rgb.g * mRgbYcbcr[1, 1] + rgb.b * mRgbYcbcr[1, 2];
+            yCbCr.c = rgb.r * mRgbYcbcr[2, 0] + rgb.g * mRgbYcbcr[2, 1] + rgb.b * mRgbYcbcr[2, 2];
 
             //if (ycbcr.a > 255f || ycbcr.b > 255f || ycbcr.c > 255f)
             //    Console.WriteLine("Valor ycbcr desbordado");
 
-            return ycbcr;
+            return yCbCr;
         }
     }
 }

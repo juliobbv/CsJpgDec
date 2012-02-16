@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
 using System.Drawing.Imaging;
+using LibPixz.Colorspaces;
 
 namespace LibPixz
 {
@@ -63,19 +64,19 @@ namespace LibPixz
             pBase = (Byte*)bitmapData.Scan0.ToPointer();
         }
 
-        public Color GetPixel(int x, int y)
+        public Color2 GetPixel(int x, int y)
         {
             pixelData = (PixelData*)(pBase + y * stride + x * sizeof(PixelData));
-            return Color.FromArgb(pixelData->alpha, pixelData->red, pixelData->green, pixelData->blue);
+            return new Color2() { a = pixelData->alpha, r = pixelData->red, g = pixelData->green, b = pixelData->blue };
         }
 
-        public void SetPixel(int x, int y, Color color)
+        public void SetPixel(int x, int y, Color2 color)
         {
             PixelData* data = (PixelData*)(pBase + y * stride + x * sizeof(PixelData));
-            data->alpha = color.A;
-            data->red = color.R;
-            data->green = color.G;
-            data->blue = color.B;
+            data->alpha = color.a;
+            data->red = color.r;
+            data->green = color.g;
+            data->blue = color.b;
         }
 
         public void UnlockImage()
@@ -85,9 +86,9 @@ namespace LibPixz
             pBase = null;
         }
 
-        public Color[,] GetImage()
+        public Color2[,] GetImage()
         {
-            Color[,] imagen = new Color[height, width];
+            Color2[,] imagen = new Color2[height, width];
 
             this.LockImage();
             for (int y = 0; y < height; y++)
@@ -102,7 +103,7 @@ namespace LibPixz
             return imagen;
         }
 
-        public void SetImage(Color[,] imagen)
+        public void SetImage(Color2[,] imagen)
         {
             this.LockImage();
 

@@ -34,6 +34,7 @@ namespace PixzCli
                     Pixz.Decode(file.FullName);
                 }
                 watch.Stop();
+
                 Console.WriteLine("Test took: " + watch.ElapsedMilliseconds / 1000.0 + " s");
                 Console.ReadKey();
                 return true;

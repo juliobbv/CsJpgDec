@@ -34,13 +34,13 @@ namespace LibPixz.Colorspaces
         static float eps = 216f / 24389f;
         static float ka = 24389f / 27f;
 
-        public Color ConvertToRgb(Info info)
+        public Color2 ConvertToRgb(Info info)
         {
             info = LabToXyz(info);
             return XyzToRgb(info);
         }
 
-        public Info ConvertFromRgb(Color rgb)
+        public Info ConvertFromRgb(Color2 rgb)
         {
             Info info = RgbToXyz(rgb);
             return XyzToLab(info);
@@ -58,7 +58,7 @@ namespace LibPixz.Colorspaces
             }
         }
 
-        internal Info RgbToXyz(Color color)
+        internal Info RgbToXyz(Color2 color)
         {
             Info rgb;
             Info xyz;
@@ -68,9 +68,9 @@ namespace LibPixz.Colorspaces
             //rgb.b = (float)Math.Pow(color.G / 255.0, 2.2);
             //rgb.c = (float)Math.Pow(color.B / 255.0, 2.2);
 
-            rgb.a = lutPow[color.R];
-            rgb.b = lutPow[color.G];
-            rgb.c = lutPow[color.B];
+            rgb.a = lutPow[color.r];
+            rgb.b = lutPow[color.g];
+            rgb.c = lutPow[color.b];
 
             // Valores xyz
             xyz.a = rgb.a * msRgbXyz[0, 0] + rgb.b * msRgbXyz[0, 1] + rgb.c * msRgbXyz[0, 2];
@@ -80,7 +80,7 @@ namespace LibPixz.Colorspaces
             return xyz;
         }
 
-        internal Color XyzToRgb(Info xyz)
+        internal Color2 XyzToRgb(Info xyz)
         {
             float r, g, b;
             int ir, ig, ib;
@@ -93,7 +93,7 @@ namespace LibPixz.Colorspaces
             ig = GetRgbColor(g);
             ib = GetRgbColor(b);
 
-            return Color.FromArgb(ir, ig, ib);
+            return new Color2() { a = 255, r = (byte)ir, g = (byte)ig, b = (byte)ib };
         }
 
         internal Info XyzToLab(Info xyz, bool clamp = false)

@@ -69,7 +69,7 @@ namespace LibPixz.Markers
                 Logger.WriteLine(ex.StackTrace);
             }
 
-            Color[,] imagen = MergeChannels(imgInfo, img);
+            Color2[,] imagen = MergeChannels(imgInfo, img);
             Bitmap bmp = new Bitmap(imgInfo.width, imgInfo.height);
             BmpData conv = new BmpData(bmp);
 
@@ -104,9 +104,9 @@ namespace LibPixz.Markers
             }
         }   
 
-        protected static Color[,] MergeChannels(ImgInfo imgInfo, float[][,] imgS)
+        protected static Color2[,] MergeChannels(ImgInfo imgInfo, float[][,] imgS)
         {
-            Color[,] img = new Color[imgInfo.height, imgInfo.width];
+            Color2[,] img = new Color2[imgInfo.height, imgInfo.width];
             var converter = new Colorspaces.YCbCr();
 
             for (int y = 0; y < imgInfo.height; y++)
