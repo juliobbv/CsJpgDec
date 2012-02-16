@@ -148,10 +148,10 @@ namespace LibPixz.Markers
             if (scaleX != 1 || scaleY != 1)
                 imgP = ImgOps.NearestNeighborResize(imgP, blkSize, blkSize, scaleX, scaleY);
 
-            ComponerBloque(imgInfo, img, imgP, blkSize * scaleX, blkSize * scaleY, ofsX, ofsY);
+            InsertBlockInImage(imgInfo, img, imgP, blkSize * scaleX, blkSize * scaleY, ofsX, ofsY);
         }
 
-        protected static void ComponerBloque(ImgInfo imgInfo, float[,] imagen, float[,] bloque, int tamX, int tamY, int ofsX, int ofsY)
+        protected static void InsertBlockInImage(ImgInfo imgInfo, float[,] imagen, float[,] bloque, int tamX, int tamY, int ofsX, int ofsY)
         {
             int finX = ofsX + tamX > imgInfo.width ? imgInfo.width % tamX : tamX;
             int finY = ofsY + tamY > imgInfo.height ? imgInfo.height % tamY : tamY;

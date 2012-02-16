@@ -32,7 +32,7 @@ namespace LibPixz
             {
                 for (int x = 0; x < tam; x++)
                 {
-                    pixDct[y, x] = (float)Math.Round((float)pixQnt[y, x] * matriz[y * tam + x]);
+                    pixDct[y, x] = (float)(pixQnt[y, x] * matriz[y * tam + x]);
                 }
             }
 
