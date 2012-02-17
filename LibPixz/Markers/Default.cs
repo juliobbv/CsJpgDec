@@ -16,6 +16,7 @@ namespace LibPixz.Markers
             {
                 Logger.Write(" found outside of image");
             }
+
             Logger.WriteLine(" at: " + reader.BaseStream.Position.ToString("X"));
 
             // Check if marker is not followed by a length argument

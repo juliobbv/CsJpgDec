@@ -40,11 +40,11 @@ namespace LibPixz
 
             stream.Seek(0, SeekOrigin.Begin);
 
-            try
-            {
-                bool eof = false;
+            bool eof = false;
 
-                for (int image = 1; ; image++)
+            for (int image = 1; ; image++)
+            {
+                try
                 {
                     ImgInfo imgInfo = new ImgInfo();
 
@@ -70,6 +70,7 @@ namespace LibPixz
                                 images.Add(Sos.Read(reader, imgInfo));
                                 break;
                             case MarkersId.Soi:
+                                imgInfo = new ImgInfo();
                                 Logger.Write("Start of Image " + image);
                                 Logger.WriteLine(" at: " + reader.BaseStream.Position.ToString("X"));
                                 imgInfo.startOfImageFound = true;
@@ -95,10 +96,14 @@ namespace LibPixz
                         }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                Logger.WriteLine(ex.Message);
+                catch (EndOfStreamException)
+                {
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteLine(ex.Message);
+                }
             }
 
             reader.Close();
