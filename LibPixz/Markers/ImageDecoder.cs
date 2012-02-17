@@ -42,7 +42,7 @@ namespace LibPixz.Markers
                 int numMcusX = (imgInfo.width + sizeBlockX - 1) / sizeBlockX;
                 int numMcusY = (imgInfo.height + sizeBlockY - 1) / sizeBlockY;
 
-                for (int mcu = 0; mcu < numMcusX * numMcusY; mcu = NextMcuPos(imgInfo, bReader, mcu))
+                for (int mcu = 0; mcu < numMcusX * numMcusY; mcu = NextMcuPos(imgInfo, bReader, mcu, numMcusX, numMcusY))
                 {
                     // X and Y coordinates of current MCU
                     int mcuX = mcu % numMcusX;
@@ -83,13 +83,14 @@ namespace LibPixz.Markers
             return bmp;
         }
 
-        protected static int NextMcuPos(ImgInfo imgInfo, BitReader bReader, int mcu)
+        protected static int NextMcuPos(ImgInfo imgInfo, BitReader bReader, int mcu, int numMcusX, int numMcusY)
         {
             // If we are expecting a restart marker, find it in the stream,
             // reset the DC prediction variables and calculate the new MCU position
             // otherwise, just increment the position by one
             if (imgInfo.hasRestartMarkers &&
-               (mcu % imgInfo.restartInterval) == imgInfo.restartInterval - 1)
+               (mcu % imgInfo.restartInterval) == imgInfo.restartInterval - 1 &&
+               (mcu != numMcusX * numMcusY - 1))
             {
                 Pixz.MarkersId currRestMarker = bReader.SyncStreamToNextRestartMarker();
                 int difference = currRestMarker - imgInfo.prevRestMarker;
