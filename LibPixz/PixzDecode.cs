@@ -72,6 +72,7 @@ namespace LibPixz
                             case MarkersId.Soi:
                                 Logger.Write("Start of Image " + image);
                                 Logger.WriteLine(" at: " + reader.BaseStream.Position.ToString("X"));
+                                imgInfo.startOfImageFound = true;
                                 break;
                             case MarkersId.Dri:
                                 Dri.Read(reader, imgInfo);

@@ -52,8 +52,8 @@
     <Compile Include="Logger.cs" />
     <Compile Include="Markers\Default.cs" />
     <Compile Include="Markers\Dri.cs" />
-    <Compile Include="Markers\ImageDecoder.cs" />
-    <Compile Include="Markers\ImgInfo.cs" />
+    <Compile Include="ImageDecoder.cs" />
+    <Compile Include="ImgInfo.cs" />
     <Compile Include="ImgOps.cs" />
     <Compile Include="Markers\Dht.cs" />
     <Compile Include="Markers\Dqt.cs" />

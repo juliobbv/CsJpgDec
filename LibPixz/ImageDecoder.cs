@@ -5,7 +5,7 @@ using System.Linq;
 using System.Drawing;
 using LibPixz.Colorspaces;
 
-namespace LibPixz.Markers
+namespace LibPixz
 {
     public class ImageDecoder
     {
@@ -29,7 +29,7 @@ namespace LibPixz.Markers
             {
                 var componentMax = imgInfo.components.Aggregate((a, b) =>
                 {
-                    return new ComponentInfo()
+                    return new Markers.ComponentInfo()
                     {
                         samplingFactorX = Math.Max(a.samplingFactorX, b.samplingFactorX),
                         samplingFactorY = Math.Max(a.samplingFactorY, b.samplingFactorY)
@@ -90,12 +90,12 @@ namespace LibPixz.Markers
             // otherwise, just increment the position by one
             if (imgInfo.hasRestartMarkers &&
                (mcu % imgInfo.restartInterval) == imgInfo.restartInterval - 1 &&
-               (mcu != numMcusX * numMcusY - 1))
+               (mcu < numMcusX * numMcusY - 1))
             {
                 Pixz.MarkersId currRestMarker = bReader.SyncStreamToNextRestartMarker();
                 int difference = currRestMarker - imgInfo.prevRestMarker;
 
-                if (difference <= 0) difference += Dri.RestartMarkerPeriod;
+                if (difference <= 0) difference += Markers.Dri.RestartMarkerPeriod;
 
                 ResetDeltas(imgInfo);
                 imgInfo.mcuStrip += difference;

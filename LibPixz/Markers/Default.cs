@@ -11,6 +11,11 @@ namespace LibPixz.Markers
         public static void Read(BinaryReader reader, ImgInfo imgInfo, Pixz.MarkersId markerId)
         {
             Logger.Write("Unknown marker (" + markerId.ToString("X") + ")");
+
+            if (!imgInfo.startOfImageFound)
+            {
+                Logger.Write(" found outside of image");
+            }
             Logger.WriteLine(" at: " + reader.BaseStream.Position.ToString("X"));
 
             // Check if marker is not followed by a length argument
@@ -18,6 +23,8 @@ namespace LibPixz.Markers
                 return;
             if (markerId == Pixz.MarkersId.LiteralFF)
                 return;
+
+            if (!imgInfo.startOfImageFound) return;
 
             ushort length = reader.ReadBEUInt16();
             Logger.WriteLine("Length: " + length.ToString());
