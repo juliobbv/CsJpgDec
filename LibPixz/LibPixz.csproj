@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="BinaryReaderEx.cs" />
     <Compile Include="BmpData.cs" />
+    <Compile Include="Colorspaces\Rgb.cs" />
     <Compile Include="Colorspaces\YCbCr.cs" />
     <Compile Include="Colorspaces\IColorspaceConverter.cs" />
     <Compile Include="Colorspaces\Lab.cs" />
@@ -50,6 +51,7 @@
     <Compile Include="Huffman\BitReader.cs" />
     <Compile Include="Huffman\Huffman.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="Markers\App14.cs" />
     <Compile Include="Markers\Default.cs" />
     <Compile Include="Markers\Dri.cs" />
     <Compile Include="ImageDecoder.cs" />

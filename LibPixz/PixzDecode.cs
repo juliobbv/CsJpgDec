@@ -16,6 +16,7 @@ namespace LibPixz
             LiteralFF = 0x00,
             Soi = 0xd8,
             App0 = 0xe0,
+            App14 = 0xee,
             Dqt = 0xdb,
             Sof0 = 0xc0,
             Dht = 0xc4,
@@ -56,6 +57,9 @@ namespace LibPixz
                         switch ((MarkersId)markerId)
                         {
                             case MarkersId.App0:
+                                break;
+                            case MarkersId.App14:
+                                App14.Read(reader, imgInfo);
                                 break;
                             case MarkersId.Dqt:
                                 Dqt.Read(reader, imgInfo);

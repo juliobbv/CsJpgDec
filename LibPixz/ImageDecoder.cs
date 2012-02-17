@@ -112,7 +112,30 @@ namespace LibPixz
         protected static Color2[,] MergeChannels(ImgInfo imgInfo, float[][,] imgS)
         {
             Color2[,] img = new Color2[imgInfo.height, imgInfo.width];
-            var converter = new Colorspaces.YCbCr();
+            IColorspaceConverter converter;
+
+            if (imgInfo.app14MarkerFound)
+            {
+                switch (imgInfo.colorMode)
+                {
+                    case Markers.App14ColorMode.Unknown:
+                        converter = new Rgb();
+                        break;
+                    case Markers.App14ColorMode.YCbCr:
+                        converter = new YCbCr();
+                        break;
+                    case Markers.App14ColorMode.YCCK:
+                        converter = new YCbCr();
+                        break;
+                    default:
+                        converter = new Rgb();
+                        break;
+                }
+            }
+            else
+            {
+                converter = new Colorspaces.YCbCr();
+            }
 
             for (int y = 0; y < imgInfo.height; y++)
             {

@@ -22,6 +22,10 @@ namespace LibPixz
 
         public bool startOfImageFound;
 
+        // For App14 Marker (Adobe)
+        public bool app14MarkerFound;
+        public App14ColorMode colorMode;
+
         // Helper image decoding variables
         public short []deltaDc;
         public short restartMarker;
