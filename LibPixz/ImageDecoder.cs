@@ -115,7 +115,14 @@ namespace LibPixz
             }
             else
             {
-                return ++mcu;
+                if (bReader.WasEoiFound())
+                {
+                    return numMcusX * numMcusY;
+                }
+                else
+                {
+                    return ++mcu;
+                }
             }
         }   
 

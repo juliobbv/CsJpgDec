@@ -14,13 +14,6 @@ namespace LibPixz
             public byte length;
         }
 
-        internal class HuffHeader
-        {
-            public uint numCodes;
-            public uint msgSize;
-            public List<CodeInfo> table;
-        }
-
         internal static void CreateTable(ref HuffmanTable huffmanTable)
         {
             ConvertToCanonicalCode(ref huffmanTable);

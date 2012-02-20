@@ -22,14 +22,6 @@ namespace LibPixz
         bool lockReading;
 
         /// <summary>
-        /// Returns how many bits we read at once in the stream
-        /// </summary>
-        internal uint BitStride
-        {
-            get { return dataSize; }
-        }
-
-        /// <summary>
         /// Returns true if end of file has been reached and reader is padding with zeros
         /// </summary>
         internal bool PastEndOfFile
@@ -210,6 +202,17 @@ namespace LibPixz
             Flush();
 
             return tempMarker;
+        }
+
+        internal bool WasEoiFound()
+        {
+            if (lastReadMarker == Pixz.Markers.Eoi && availableBits <= 0)
+            {
+                Flush();
+                return true;
+            }
+
+            return false;
         }
     }
 }
