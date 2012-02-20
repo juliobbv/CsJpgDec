@@ -150,18 +150,26 @@ namespace LibPixz
             restartMarker = 0;
         }
 
+        /// <summary>
+        /// Read a byte from the stream, taking into account when markers are found
+        /// If we find a restart marker, lock the stream at that current position
+        /// and return bogus data on the next reads so we can at least decode part of
+        /// the image (Happens when the file is corrupted)
+        /// </summary>
+        /// <returns>A byte read from the current stream</returns>
         private byte ReadByteNonStuffed()
         {
             byte number = reader.ReadByte();
 
-            if (number == 0xff)
+            if (number == 0xff) // Marker found
             {
                 byte markerValue = reader.ReadByte();
 
-                if (markerValue == 0x00)
+                if (markerValue == 0x00) // 0xff00 is interpreted as a 0xff
                 {
                     return number;
                 }
+                // Restart marker
                 else if (markerValue >= (int)Pixz.MarkersId.Rs0 && markerValue <= (int)Pixz.MarkersId.Rs7)
                 {
                     restartMarker = markerValue;
@@ -170,10 +178,12 @@ namespace LibPixz
                 }
                 else
                 {
+                    // Non-restart marker found inside of image, we just read the next byte
+                    // (definitely not a good behavior for corrupted files) 
                     return reader.ReadByte();
                 }
             }
-            else
+            else // Not a marker, just return the read value
             {
                 return number;
             }

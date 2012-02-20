@@ -31,6 +31,7 @@ namespace LibPixz.Markers
                 throw new Exception("Invalid Adobe colorspace");
 
             Logger.WriteLine("Transform Flag: " + imgInfo.colorMode);
+            Logger.WriteLine();
         }
     }
 }

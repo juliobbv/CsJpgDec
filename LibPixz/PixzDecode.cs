@@ -76,7 +76,7 @@ namespace LibPixz
                             case MarkersId.Soi:
                                 imgInfo = new ImgInfo();
                                 Logger.Write("Start of Image " + image);
-                                Logger.WriteLine(" at: " + reader.BaseStream.Position.ToString("X"));
+                                Logger.WriteLine(" at: " + (reader.BaseStream.Position - 2).ToString("X"));
                                 imgInfo.startOfImageFound = true;
                                 break;
                             case MarkersId.Dri:
@@ -84,7 +84,7 @@ namespace LibPixz
                                 break;
                             case MarkersId.Eoi:
                                 Logger.Write("End of Image " + image);
-                                Logger.WriteLine(" at: " + reader.BaseStream.Position.ToString("X"));
+                                Logger.WriteLine(" at: " + (reader.BaseStream.Position - 2).ToString("X"));
                                 eof = true;
                                 break;
                             // Unknown markers, or markers used outside of their specified area

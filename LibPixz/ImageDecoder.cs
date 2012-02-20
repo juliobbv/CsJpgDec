@@ -9,14 +9,16 @@ namespace LibPixz
 {
     public class ImageDecoder
     {
-        const int blkSize = 8;
+        const int blkSize = 8; // JPEG decoding block size is 8x8
 
+        // Arrays used in different parts of the decoding process
         protected static float[,] blockP = new float[blkSize, blkSize];
         protected static short[,] coefDctQnt = new short[blkSize, blkSize];
         protected static float[,] coefDct = new float[blkSize, blkSize];
 
         protected internal static Bitmap DecodeImage(BinaryReader reader, ImgInfo imgInfo)
         {
+            // Used for reading those nasty variable length codes
             BitReader bReader = new BitReader(reader);
             float[][,] img = new float[imgInfo.numOfComponents][,];
 
@@ -27,6 +29,9 @@ namespace LibPixz
 
             try
             {
+                // Determine the width of height of the MCU, based on the read subsampling
+                // values from all channels (don't know if this is the correct way for all cases)
+                // but it works for the most common ones
                 var componentMax = imgInfo.components.Aggregate((a, b) =>
                 {
                     return new Markers.ComponentInfo()
@@ -36,11 +41,11 @@ namespace LibPixz
                     };
                 });
 
-                int sizeBlockX = blkSize * componentMax.samplingFactorX;
-                int sizeBlockY = blkSize * componentMax.samplingFactorY;
+                int sizeMcuX = blkSize * componentMax.samplingFactorX;
+                int sizeMcuY = blkSize * componentMax.samplingFactorY;
 
-                int numMcusX = (imgInfo.width + sizeBlockX - 1) / sizeBlockX;
-                int numMcusY = (imgInfo.height + sizeBlockY - 1) / sizeBlockY;
+                int numMcusX = (imgInfo.width + sizeMcuX - 1) / sizeMcuX;
+                int numMcusY = (imgInfo.height + sizeMcuY - 1) / sizeMcuY;
 
                 for (int mcu = 0; mcu < numMcusX * numMcusY; mcu = NextMcuPos(imgInfo, bReader, mcu, numMcusX, numMcusY))
                 {
@@ -48,8 +53,8 @@ namespace LibPixz
                     int mcuX = mcu % numMcusX;
                     int mcuY = mcu / numMcusX;
                     // Starting X and Y pixels of current MCU
-                    int ofsX = mcuX * sizeBlockX;
-                    int ofsY = mcuY * sizeBlockY;
+                    int ofsX = mcuX * sizeMcuX;
+                    int ofsY = mcuY * sizeMcuY;
 
                     for (int ch = 0; ch < imgInfo.numOfComponents; ch++)
                     {
@@ -109,6 +114,12 @@ namespace LibPixz
             }
         }   
 
+        /// <summary>
+        /// Converts from their colorspace to RGB and combines all previously decoded channels
+        /// </summary>
+        /// <param name="imgInfo"></param>
+        /// <param name="imgS"></param>
+        /// <returns>A 2D array representing the color data from the image</returns>
         protected static Color2[,] MergeChannels(ImgInfo imgInfo, float[][,] imgS)
         {
             Color2[,] img = new Color2[imgInfo.height, imgInfo.width];
@@ -119,7 +130,14 @@ namespace LibPixz
                 switch (imgInfo.colorMode)
                 {
                     case Markers.App14ColorMode.Unknown:
-                        converter = new Rgb();
+                        if (imgInfo.numOfComponents == 3)
+                        {
+                            converter = new Rgb();
+                        }
+                        else
+                        {
+                            converter = new YCbCr();
+                        }
                         break;
                     case Markers.App14ColorMode.YCbCr:
                         converter = new YCbCr();
@@ -185,8 +203,8 @@ namespace LibPixz
             // DC coefficient
             uint runAmplitude = Huffman.ReadRunAmplitude(bReader, imgInfo.huffmanTables[0, dcIndex]);
 
-            uint run = runAmplitude >> 4;
-            uint amplitude = runAmplitude & 0xf;
+            uint run = runAmplitude >> 4; // Upper nybble
+            uint amplitude = runAmplitude & 0xf; // Lower nybble
 
             coefZig[0] = (short)(Huffman.ReadCoefValue(bReader, amplitude) + imgInfo.deltaDc[compIndex]);
 
@@ -213,6 +231,8 @@ namespace LibPixz
             return coefZig;
         }
 
+        // If we found a restart marker, reset all DC prediction deltas, so we can
+        // start anew and not depend on previous (possibly corrupted) data
         public static void ResetDeltas(ImgInfo imgInfo)
         {
             for (int i = 0; i < imgInfo.numOfComponents; i++)
