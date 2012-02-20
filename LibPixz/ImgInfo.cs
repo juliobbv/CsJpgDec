@@ -30,6 +30,6 @@ namespace LibPixz
         public short []deltaDc;
         public short restartMarker;
         public int mcuStrip = 0;
-        public Pixz.MarkersId prevRestMarker = Pixz.MarkersId.Rs7;
+        public Pixz.Markers prevRestMarker = Pixz.Markers.Rs7;
     }
 }

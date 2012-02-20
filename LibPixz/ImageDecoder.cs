@@ -97,11 +97,16 @@ namespace LibPixz
                (mcu % imgInfo.restartInterval) == imgInfo.restartInterval - 1 &&
                (mcu < numMcusX * numMcusY - 1))
             {
-                Pixz.MarkersId currRestMarker = bReader.SyncStreamToNextRestartMarker();
+                Pixz.Markers currRestMarker = bReader.SyncStreamToNextRestartMarker();
+
+                if (currRestMarker == Pixz.Markers.Eoi) // If EOI marker was found
+                    return numMcusX * numMcusY; // Early terminate the decoding process
+
                 int difference = currRestMarker - imgInfo.prevRestMarker;
 
                 if (difference <= 0) difference += Markers.Dri.RestartMarkerPeriod;
 
+                // For non corrupted images, difference should be always 1
                 ResetDeltas(imgInfo);
                 imgInfo.mcuStrip += difference;
                 imgInfo.prevRestMarker = currRestMarker;

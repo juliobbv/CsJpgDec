@@ -11,7 +11,7 @@ namespace LibPixz
 {
     public partial class Pixz
     {
-        public enum MarkersId
+        public enum Markers
         {
             LiteralFF = 0x00,
             Soi = 0xd8,
@@ -54,42 +54,42 @@ namespace LibPixz
                         while (reader.ReadByte() != 0xff) ;
                         int markerId = reader.ReadByte();
 
-                        switch ((MarkersId)markerId)
+                        switch ((Markers)markerId)
                         {
-                            case MarkersId.App0:
+                            case Markers.App0:
                                 break;
-                            case MarkersId.App14:
+                            case Markers.App14:
                                 App14.Read(reader, imgInfo);
                                 break;
-                            case MarkersId.Dqt:
+                            case Markers.Dqt:
                                 Dqt.Read(reader, imgInfo);
                                 break;
-                            case MarkersId.Sof0:
+                            case Markers.Sof0:
                                 Sof0.Read(reader, imgInfo);
                                 break;
-                            case MarkersId.Dht:
+                            case Markers.Dht:
                                 Dht.Read(reader, imgInfo);
                                 break;
-                            case MarkersId.Sos:
+                            case Markers.Sos:
                                 images.Add(Sos.Read(reader, imgInfo));
                                 break;
-                            case MarkersId.Soi:
+                            case Markers.Soi:
                                 imgInfo = new ImgInfo();
                                 Logger.Write("Start of Image " + image);
                                 Logger.WriteLine(" at: " + (reader.BaseStream.Position - 2).ToString("X"));
                                 imgInfo.startOfImageFound = true;
                                 break;
-                            case MarkersId.Dri:
+                            case Markers.Dri:
                                 Dri.Read(reader, imgInfo);
                                 break;
-                            case MarkersId.Eoi:
+                            case Markers.Eoi:
                                 Logger.Write("End of Image " + image);
                                 Logger.WriteLine(" at: " + (reader.BaseStream.Position - 2).ToString("X"));
                                 eof = true;
                                 break;
                             // Unknown markers, or markers used outside of their specified area
                             default:
-                                Default.Read(reader, imgInfo, (MarkersId)markerId);
+                                Default.Read(reader, imgInfo, (Markers)markerId);
                                 break;
                         }
 

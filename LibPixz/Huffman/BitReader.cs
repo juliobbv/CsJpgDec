@@ -15,10 +15,11 @@ namespace LibPixz
         const int readerSize = sizeof(byte) * 8;
 
         BinaryReader reader;
+        Pixz.Markers lastReadMarker;
         uint readData;
         int availableBits;
         bool dataPad;
-        byte restartMarker;
+        bool lockReading;
 
         /// <summary>
         /// Returns how many bits we read at once in the stream
@@ -73,10 +74,9 @@ namespace LibPixz
                 {
                     while (availableBits <= length)
                     {
-                        // Restart markers block reads from the stream until we call flush
-                        if (restartMarker != 0) break;
+                        nextChunk = ReadByteOrMarker();
 
-                        nextChunk = ReadByteNonStuffed();
+                        if (lockReading) break;
 
                         availableBits += readerSize;
                         readData = (readData << (int)readerSize) | nextChunk;
@@ -147,63 +147,69 @@ namespace LibPixz
         {
             availableBits = 0;
             readData = 0;
-            restartMarker = 0;
+            lastReadMarker = 0;
+            lockReading = false;
         }
 
         /// <summary>
         /// Read a byte from the stream, taking into account when markers are found
-        /// If we find a restart marker, lock the stream at that current position
-        /// and return bogus data on the next reads so we can at least decode part of
+        /// If we find a marker, lock the stream at that current position
+        /// and return zeros on the next reads so we can at least decode part of
         /// the image (Happens when the file is corrupted)
         /// </summary>
         /// <returns>A byte read from the current stream</returns>
-        protected byte ReadByteNonStuffed()
+        protected byte ReadByteOrMarker()
         {
-            byte number = reader.ReadByte();
-
-            if (number == 0xff) // Marker found
+            if (!lockReading)
             {
-                byte markerValue = reader.ReadByte();
+                byte number = reader.ReadByte();
 
-                if (markerValue == 0x00) // 0xff00 is interpreted as a 0xff
+                if (number == 0xff) // Marker found
+                {
+                    byte markerValue = reader.ReadByte();
+
+                    if (markerValue == 0x00) // 0xff00 is interpreted as a 0xff value
+                    {
+                        return number;
+                    }
+                    else
+                    {
+                        lastReadMarker = (Pixz.Markers)markerValue;
+                        lockReading = true;
+
+                        return 0;
+                    }
+                }
+                else // Not a marker, just return read value
                 {
                     return number;
                 }
-                // Restart marker
-                else if (markerValue >= (int)Pixz.MarkersId.Rs0 && markerValue <= (int)Pixz.MarkersId.Rs7)
-                {
-                    restartMarker = markerValue;
-
-                    return 0;
-                }
-                else
-                {
-                    // Non-restart marker found inside of image, we just read the next byte
-                    // (definitely not a good behavior for corrupted files) 
-                    return reader.ReadByte();
-                }
             }
-            else // Not a marker, just return the read value
+            else
             {
-                return number;
+                return 0;
             }
         }
 
         /// <summary>
-        /// Finds the next restart marker
+        /// Finds the next restart marker, or the EOI marker in the stream
         /// </summary>
         /// <returns>The next restart marker</returns>
-        internal Pixz.MarkersId SyncStreamToNextRestartMarker()
+        internal Pixz.Markers SyncStreamToNextRestartMarker()
         {
-            while (restartMarker == 0)
+            // When decoding actual image pixel data, ignore all markers except
+            // restart markers, or EOI marker
+            while (!((lastReadMarker >= Pixz.Markers.Rs0 &&
+                      lastReadMarker <= Pixz.Markers.Rs7) ||
+                      lastReadMarker == Pixz.Markers.Eoi))
             {
-                ReadByteNonStuffed();
+                ReadByteOrMarker();
             }
 
-            byte restartM = restartMarker;
+            Pixz.Markers tempMarker = lastReadMarker;
             Flush();
 
-            return (Pixz.MarkersId)restartM;
+            return tempMarker;
         }
     }
 }
