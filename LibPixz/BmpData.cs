@@ -7,7 +7,7 @@ using LibPixz.Colorspaces;
 
 namespace LibPixz
 {
-    unsafe public class BmpData
+    unsafe internal class BmpData
     {
         private struct PixelData
         {
@@ -22,17 +22,17 @@ namespace LibPixz
             }
         }
 
-        public int Width
+        internal int Width
         {
             get { return width; }
         }
 
-        public int Height
+        internal int Height
         {
             get { return height; }
         }
 
-        public Bitmap WorkingBitmap
+        internal Bitmap WorkingBitmap
         {
             get { return workingBitmap; }
         }
@@ -45,7 +45,7 @@ namespace LibPixz
         Byte* pBase = null;
         PixelData* pixelData = null;
         
-        public BmpData(Bitmap inputBitmap)
+        internal BmpData(Bitmap inputBitmap)
         {
             workingBitmap = inputBitmap;
             width = this.workingBitmap.Width;
@@ -64,13 +64,13 @@ namespace LibPixz
             pBase = (Byte*)bitmapData.Scan0.ToPointer();
         }
 
-        public Color2 GetPixel(int x, int y)
+        internal Color2 GetPixel(int x, int y)
         {
             pixelData = (PixelData*)(pBase + y * stride + x * sizeof(PixelData));
             return new Color2() { a = pixelData->alpha, r = pixelData->red, g = pixelData->green, b = pixelData->blue };
         }
 
-        public void SetPixel(int x, int y, Color2 color)
+        internal void SetPixel(int x, int y, Color2 color)
         {
             PixelData* data = (PixelData*)(pBase + y * stride + x * sizeof(PixelData));
             data->alpha = color.a;
@@ -79,14 +79,14 @@ namespace LibPixz
             data->blue = color.b;
         }
 
-        public void UnlockImage()
+        internal void UnlockImage()
         {
             workingBitmap.UnlockBits(bitmapData);
             bitmapData = null;
             pBase = null;
         }
 
-        public Color2[,] GetImage()
+        internal Color2[,] GetImage()
         {
             Color2[,] imagen = new Color2[height, width];
 
@@ -103,7 +103,7 @@ namespace LibPixz
             return imagen;
         }
 
-        public void SetImage(Color2[,] imagen)
+        internal void SetImage(Color2[,] imagen)
         {
             this.LockImage();
 

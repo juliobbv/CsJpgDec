@@ -6,7 +6,7 @@ using LibPixz.Markers;
 
 namespace LibPixz
 {
-    public class ImgInfo
+    internal class ImgInfo
     {
         public ushort length;
         public byte dataPrecision;

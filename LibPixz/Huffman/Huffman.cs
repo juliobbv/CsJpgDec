@@ -5,29 +5,29 @@ using LibPixz.Markers;
 
 namespace LibPixz
 {
-    public class Huffman
+    internal class Huffman
     {
-        public struct CodeInfo
+        internal struct CodeInfo
         {
             public ushort number;
             public uint code;
             public byte length;
         }
 
-        public class HuffHeader
+        internal class HuffHeader
         {
             public uint numCodes;
             public uint msgSize;
             public List<CodeInfo> table;
         }
 
-        public static void CreateTable(ref HuffmanTable huffmanTable)
+        internal static void CreateTable(ref HuffmanTable huffmanTable)
         {
             ConvertToCanonicalCode(ref huffmanTable);
             PreparePreindexedTables(ref huffmanTable);
         }
 
-        public static ushort ReadRunAmplitude(BitReader bReader, HuffmanTable table)
+        internal static ushort ReadRunAmplitude(BitReader bReader, HuffmanTable table)
         {
             ushort code = bReader.Peek(table.maxCodeLength);
 
@@ -37,7 +37,7 @@ namespace LibPixz
             return currentCode.number;
         }
 
-        public static short ReadCoefValue(BitReader bReader, uint size)
+        internal static short ReadCoefValue(BitReader bReader, uint size)
         {
             if (size == 0) return 0;
 
@@ -46,7 +46,7 @@ namespace LibPixz
             return SpecialBitsToValue(specialBits, (short)size);
         }
 
-        public static short SpecialBitsToValue(ushort number, short size)
+        internal static short SpecialBitsToValue(ushort number, short size)
         {
             int threshold = 1 << (size - 1);
 
@@ -60,7 +60,7 @@ namespace LibPixz
             }
         }
 
-        protected static void ConvertToCanonicalCode(ref HuffmanTable huffmanTable)
+        internal static void ConvertToCanonicalCode(ref HuffmanTable huffmanTable)
         {
             int newCode = -1; // Para compensar con el incremento inicial dentro del for debajo
             uint prevLength = 1;
@@ -90,7 +90,7 @@ namespace LibPixz
             huffmanTable.maxCodeLength = (byte)prevLength;
         }
 
-        protected static void PreparePreindexedTables(ref HuffmanTable huffmanTable)
+        internal static void PreparePreindexedTables(ref HuffmanTable huffmanTable)
         {
             // Codigo de datos preindizados
 

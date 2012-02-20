@@ -343,7 +343,7 @@ namespace LibPixz
                 coefDct[tam - 1, x] = 96f;
         }
 
-        protected internal static void ResizeAndInsertBlock(ImgInfo imgInfo, float[,] block, float[,] imagen, int tamX, int tamY, int ofsX, int ofsY, int scaleX, int scaleY)
+        internal static void ResizeAndInsertBlock(ImgInfo imgInfo, float[,] block, float[,] imagen, int tamX, int tamY, int ofsX, int ofsY, int scaleX, int scaleY)
         {
             // Nearest neighbor interpolation
             // For staircase FTW

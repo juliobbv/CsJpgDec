@@ -9,9 +9,9 @@ namespace LibPixz
     /// <summary>
     /// Extensions for BinaryReader that enable reading big endian numbers,
     /// </summary>
-    public static class BinaryReaderEx
+    internal static class BinaryReaderEx
     {
-        public static ushort ReadBEUInt16(this BinaryReader reader)
+        internal static ushort ReadBEUInt16(this BinaryReader reader)
         {
             byte upperByte = reader.ReadByte();
             byte lowerByte = reader.ReadByte();

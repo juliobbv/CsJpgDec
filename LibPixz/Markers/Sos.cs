@@ -16,7 +16,8 @@ namespace LibPixz.Markers
             LogMarker(reader, name);
 
             if (imgInfo.numOfComponents != 1 && imgInfo.numOfComponents != 3)
-                throw new Exception("Unsupported format");
+                throw new Exception("Unsupported number of components (" + 
+                    imgInfo.numOfComponents + ")");
 
             ushort length = reader.ReadBEUInt16();
             byte componentsInScan = reader.ReadByte();

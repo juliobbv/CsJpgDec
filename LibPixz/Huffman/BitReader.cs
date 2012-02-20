@@ -9,7 +9,7 @@ namespace LibPixz
     /// <summary>
     /// Restart marker-aware bit reader for JPEG decoding
     /// </summary>
-    public class BitReader
+    internal class BitReader
     {
         const int dataSize = sizeof(ushort) * 8;
         const int readerSize = sizeof(byte) * 8;
@@ -23,7 +23,7 @@ namespace LibPixz
         /// <summary>
         /// Returns how many bits we read at once in the stream
         /// </summary>
-        public uint BitStride
+        internal uint BitStride
         {
             get { return dataSize; }
         }
@@ -31,7 +31,7 @@ namespace LibPixz
         /// <summary>
         /// Returns true if end of file has been reached and reader is padding with zeros
         /// </summary>
-        public bool PastEndOfFile
+        internal bool PastEndOfFile
         {
             get { return dataPad && availableBits <= 0; }
         }
@@ -39,12 +39,12 @@ namespace LibPixz
         /// <summary>
         /// Returns the BinaryReader the BitReader is using
         /// </summary>
-        public BinaryReader BaseBinaryReader
+        internal BinaryReader BaseBinaryReader
         {
             get { return reader; }
         }
 
-        public BitReader(BinaryReader reader)
+        internal BitReader(BinaryReader reader)
         {
             Flush();
             dataPad = false;
@@ -60,7 +60,7 @@ namespace LibPixz
         /// zeros to pad the result, and trailing zeros to fill the requested length if past the
         /// end of stream
         /// </returns>
-        public ushort Peek(uint length)
+        internal ushort Peek(uint length)
         {
             if (length > dataSize) throw new Exception("Reading too many bits");
 
@@ -107,7 +107,7 @@ namespace LibPixz
         /// zeros to pad the result, and trailing zeros to fill the requested length if past the
         /// end of stream
         /// </returns>
-        public ushort Read(uint length)
+        internal ushort Read(uint length)
         {
             if (length > dataSize) throw new Exception("Reading too many bits");
 
@@ -126,7 +126,7 @@ namespace LibPixz
         /// <summary>
         /// Flush all data in the buffer and rewinds all readahead bytes
         /// </summary>
-        public void StopReading()
+        internal void StopReading()
         {
             if (!dataPad)
             {
@@ -143,7 +143,7 @@ namespace LibPixz
         /// Deletes all data in the buffer, without rewinding all readahead bytes
         /// in stream
         /// </summary>
-        public void Flush()
+        protected void Flush()
         {
             availableBits = 0;
             readData = 0;
@@ -157,7 +157,7 @@ namespace LibPixz
         /// the image (Happens when the file is corrupted)
         /// </summary>
         /// <returns>A byte read from the current stream</returns>
-        private byte ReadByteNonStuffed()
+        protected byte ReadByteNonStuffed()
         {
             byte number = reader.ReadByte();
 
@@ -193,7 +193,7 @@ namespace LibPixz
         /// Finds the next restart marker
         /// </summary>
         /// <returns>The next restart marker</returns>
-        public Pixz.MarkersId SyncStreamToNextRestartMarker()
+        internal Pixz.MarkersId SyncStreamToNextRestartMarker()
         {
             while (restartMarker == 0)
             {

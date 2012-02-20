@@ -6,7 +6,7 @@ using System.IO;
 
 namespace LibPixz.Markers
 {
-    public struct HuffmanTable
+    internal struct HuffmanTable
     {
         public bool valid;
         public byte id;
@@ -46,7 +46,7 @@ namespace LibPixz.Markers
                 throw new Exception("Invalid ID for huffman table");
 
             if ((tableInfo & 0xe0) != 0)  // High 3 bits of tableInfo must be zero
-                throw new Exception("Invalid :(");
+                throw new Exception("Invalid huffman table");
 
             var huffmanTable = new HuffmanTable();
 

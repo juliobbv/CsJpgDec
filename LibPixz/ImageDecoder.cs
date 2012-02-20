@@ -7,7 +7,7 @@ using LibPixz.Colorspaces;
 
 namespace LibPixz
 {
-    public class ImageDecoder
+    internal class ImageDecoder
     {
         const int blkSize = 8; // JPEG decoding block size is 8x8
 
@@ -16,7 +16,7 @@ namespace LibPixz
         protected static short[,] coefDctQnt = new short[blkSize, blkSize];
         protected static float[,] coefDct = new float[blkSize, blkSize];
 
-        protected internal static Bitmap DecodeImage(BinaryReader reader, ImgInfo imgInfo)
+        internal static Bitmap DecodeImage(BinaryReader reader, ImgInfo imgInfo)
         {
             // Used for reading those nasty variable length codes
             BitReader bReader = new BitReader(reader);
@@ -88,7 +88,7 @@ namespace LibPixz
             return bmp;
         }
 
-        protected static int NextMcuPos(ImgInfo imgInfo, BitReader bReader, int mcu, int numMcusX, int numMcusY)
+        internal static int NextMcuPos(ImgInfo imgInfo, BitReader bReader, int mcu, int numMcusX, int numMcusY)
         {
             // If we are expecting a restart marker, find it in the stream,
             // reset the DC prediction variables and calculate the new MCU position
@@ -120,7 +120,7 @@ namespace LibPixz
         /// <param name="imgInfo"></param>
         /// <param name="imgS"></param>
         /// <returns>A 2D array representing the color data from the image</returns>
-        protected static Color2[,] MergeChannels(ImgInfo imgInfo, float[][,] imgS)
+        internal static Color2[,] MergeChannels(ImgInfo imgInfo, float[][,] imgS)
         {
             Color2[,] img = new Color2[imgInfo.height, imgInfo.width];
             IColorspaceConverter converter;
@@ -181,7 +181,7 @@ namespace LibPixz
             return img;
         }
 
-        protected static void DecodeBlock(BitReader bReader, ImgInfo imgInfo, float[,] img,
+        internal static void DecodeBlock(BitReader bReader, ImgInfo imgInfo, float[,] img,
             int compIndex, int ofsX, int ofsY, int scaleX, int scaleY)
         {
             int quantIndex = imgInfo.components[compIndex].quantTableId;
@@ -194,7 +194,7 @@ namespace LibPixz
             ImgOps.ResizeAndInsertBlock(imgInfo, blockP, img, blkSize, blkSize, ofsX, ofsY, scaleX, scaleY);
         }
 
-        protected static short[] GetCoefficients(BitReader bReader, ImgInfo imgInfo, int compIndex, int numCoefs)
+        internal static short[] GetCoefficients(BitReader bReader, ImgInfo imgInfo, int compIndex, int numCoefs)
         {
             var coefZig = new short[numCoefs];
             int acIndex = imgInfo.components[compIndex].acHuffmanTable;
@@ -233,7 +233,7 @@ namespace LibPixz
 
         // If we found a restart marker, reset all DC prediction deltas, so we can
         // start anew and not depend on previous (possibly corrupted) data
-        public static void ResetDeltas(ImgInfo imgInfo)
+        internal static void ResetDeltas(ImgInfo imgInfo)
         {
             for (int i = 0; i < imgInfo.numOfComponents; i++)
             {
