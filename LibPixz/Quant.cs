@@ -5,7 +5,7 @@ using System.Text;
 
 namespace LibPixz
 {
-    public partial class ImgOps
+    internal partial class ImgOps
     {
         protected internal static short[,] Quant(float[,] pixDct, ushort[] matriz, int tam)
         {

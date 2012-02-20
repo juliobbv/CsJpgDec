@@ -21,14 +21,10 @@ namespace PixzGui
 
         private void btnAbrir_Click(object sender, EventArgs e)
         {
-            //try
-            //{
             using (OpenFileDialog dialogo = new OpenFileDialog())
             {
                 if (dialogo.ShowDialog() == DialogResult.OK)
                 {
-                    //if (imgO != null) imgO.Dispose();
-
                     Stopwatch watch = new Stopwatch();
 
                     //if (Path.GetExtension(dialogo.FileName).ToLower() == ".jpg")
@@ -53,11 +49,6 @@ namespace PixzGui
                     }
                 }
             }
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show("Ocurrió un error al abrir al archivo\n" + ex.Message);
-            //}
         }
 
         private void pbxOriginal_BackgroundImageChanged(object sender, EventArgs e)

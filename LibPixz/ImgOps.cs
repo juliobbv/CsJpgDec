@@ -6,9 +6,9 @@ using System.Drawing;
 
 namespace LibPixz
 {
-    unsafe public partial class ImgOps
+    unsafe internal partial class ImgOps
     {
-        public static Dictionary<int, float[,]> tablasCos = new Dictionary<int, float[,]>()
+        internal static Dictionary<int, float[,]> tablasCos = new Dictionary<int, float[,]>()
         {
             { 1, GetTablaCos(1) },
             { 2, GetTablaCos(2) },
@@ -19,7 +19,7 @@ namespace LibPixz
             { 64, GetTablaCos(64) },
         };
 
-        public static Dictionary<int, float[,]> tablasICos = new Dictionary<int, float[,]>()
+        internal static Dictionary<int, float[,]> tablasICos = new Dictionary<int, float[,]>()
         {
             { 1, GetTablaICos(1) },
             { 2, GetTablaICos(2) },
