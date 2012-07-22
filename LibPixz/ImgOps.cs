@@ -171,9 +171,9 @@ namespace LibPixz
             return res;
         }
 
-        protected internal static float[,] Fdct(float[,] bloque, int tamX, int tamY)
+        protected internal static void Fdct(float[,] bloque, float[,] bloqueDct, int tamX, int tamY)
         {
-            float[,] bloqueDct = new float[tamY, tamX];
+            //float[,] bloqueDct = new float[tamY, tamX];
             float[][] coefYU = new float[tamY][];
             float[,] coefUY = new float[tamX, tamY];
             float[][] coefUV = new float[tamY][];
@@ -209,12 +209,12 @@ namespace LibPixz
                 for (int u = 0; u < tamX; u++)
                     bloqueDct[v, u] = (float)Math.Round(coefUV[u][v]);
 
-            return bloqueDct;
+            //return bloqueDct;
         }
 
-        protected internal static float[,] Fidct(float[,] bloque, int tamX, int tamY)
+        protected internal static void Fidct(float[,] bloque, float[,] bloqueDct, int tamX, int tamY)
         {
-            float[,] bloqueDct = new float[tamY, tamX];
+            //float[,] bloqueDct = new float[tamY, tamX];
             float[][] coefYU = new float[tamY][];
             float[,] coefUY = new float[tamX, tamY];
             float[][] coefUV = new float[tamY][];
@@ -250,7 +250,7 @@ namespace LibPixz
                 for (int u = 0; u < tamX; u++)
                     bloqueDct[v, u] = (float)Math.Round(coefUV[u][v]);
 
-            return bloqueDct;
+            //return bloqueDct;
         }
 
         protected internal static void Dct(float[,] bloque, float[,] bloqueDct, int tamX, int tamY)
