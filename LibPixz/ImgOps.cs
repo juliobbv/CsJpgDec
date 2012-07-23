@@ -185,7 +185,7 @@ namespace LibPixz
             return res;
         }
 
-        static void Ifct8(float* bloque, float[] res, float[,] tIcos)
+        static void Ifct8(float* bloque, float* res, float[,] tIcos)
         {
             float dc = bloque[0] * tIcos[0, 0];
 
@@ -285,21 +285,24 @@ namespace LibPixz
 
         protected internal static void Fidct(float[,] bloque, float[,] bloqueDct, int tamX, int tamY)
         {
-            float[][] coefYU = new float[tamY][];
+            float[,] coefYU = new float[tamY, tamX];
             float[,] coefUY = new float[tamX, tamY];
-            float[][] coefUV = new float[tamY][];
+            float[,] coefUV = new float[tamX, tamY];
 
             float[,] tCosXU = tablasICos[tamX];
             float[,] tCosYV = tablasICos[tamY];
 
             // Sacamos el IDCT de cada fila del bloque
             fixed (float* inicio = bloque)
+            fixed (float* inicioSalida = coefYU)
             {
                 float* renglon = inicio;
+                float* renglonS = inicioSalida;
+
                 //Parallel.For(0, tamY, y =>
                 for (int y = 0; y < tamY; y++)
                 {
-                    coefYU[y] = Ifct8(y * tamX + renglon, tamX, tCosXU);
+                    Ifct8(y * tamX + renglon, y * tamX + renglonS, tCosXU);
                 }//);
             }
 
@@ -307,18 +310,21 @@ namespace LibPixz
 
             // Ahora sacamos el DCT por columna de los resultados anteriores
             fixed (float* inicio = coefUY)
+            fixed (float* inicioSalida = coefUV) 
             {
                 float* columna = inicio;
+                float* columnaS = inicioSalida;
+
                 for (int u = 0; u < tamX; u++)
                 //Parallel.For(0, tamX, u =>
                 {
-                    coefUV[u] = Ifct8(u * tamY + columna, tamY, tCosYV);
+                    Ifct8(u * tamY + columna, u * tamY + inicioSalida, tCosYV);
                 }//);
             }
 
             for (int v = 0; v < tamY; v++)
                 for (int u = 0; u < tamX; u++)
-                    bloqueDct[v, u] = (float)Math.Round(coefUV[u][v]);
+                    bloqueDct[v, u] = (float)Math.Round(coefUV[u, v]);
 
             //return bloqueDct;
         }
