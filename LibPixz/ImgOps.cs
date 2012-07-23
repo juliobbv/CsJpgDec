@@ -112,14 +112,10 @@ namespace LibPixz
             fixed (float* inicio = bloque)
             fixed (float* inicioSalida = coefYU)
             {
-                float* renglon = inicio;
-                float* renglonS = inicioSalida;
-
-                //Parallel.For(0, tamY, y =>
                 for (int y = 0; y < tamY; y++)
                 {
-                    Ifct8(y * tamX + renglon, y * tamX + renglonS, tCosXU);
-                }//);
+                    Ifct8(y * tamX + inicio, y * tamX + inicioSalida, tCosXU);
+                }
             }
 
             coefUY = Common.Transpose(coefYU, tamX, tamY);
@@ -128,19 +124,19 @@ namespace LibPixz
             fixed (float* inicio = coefUY)
             fixed (float* inicioSalida = coefUV) 
             {
-                float* columna = inicio;
-                float* columnaS = inicioSalida;
-
                 for (int u = 0; u < tamX; u++)
-                //Parallel.For(0, tamX, u =>
                 {
-                    Ifct8(u * tamY + columna, u * tamY + inicioSalida, tCosYV);
-                }//);
+                    Ifct8(u * tamY + inicio, u * tamY + inicioSalida, tCosYV);
+                }
             }
 
             for (int v = 0; v < tamY; v++)
+            {
                 for (int u = 0; u < tamX; u++)
+                {
                     bloqueDct[v, u] = (float)Math.Round(coefUV[u, v]);
+                }
+            }
         }
 
         protected internal static void Idct(float[,] bloque, float[,] bloqueDct, int tamX, int tamY)
