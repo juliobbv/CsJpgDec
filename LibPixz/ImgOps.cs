@@ -226,14 +226,14 @@ namespace LibPixz
             suma30 += bloque[5] * tIcos[5, 3];
             suma30 += bloque[7] * tIcos[7, 3];
 
-            res[0] = dc + suma00 + suma01 + suma02;
-            res[1] = dc + suma10 + suma11 - suma02;
-            res[2] = dc + suma20 - suma11 - suma02;
-            res[3] = dc + suma30 - suma01 + suma02;
-            res[4] = dc - suma30 - suma01 + suma02;
-            res[5] = dc - suma20 - suma11 - suma02;
-            res[6] = dc - suma10 + suma11 - suma02;
-            res[7] = dc - suma00 + suma01 + suma02;
+            res[0] = dc + suma02 + suma01 + suma00;
+            res[7] = dc + suma02 + suma01 - suma00;
+            res[3] = dc + suma02 - suma01 + suma30;
+            res[4] = dc + suma02 - suma01 - suma30;
+            res[1] = dc - suma02 + suma11 + suma10;
+            res[6] = dc - suma02 + suma11 - suma10;
+            res[2] = dc - suma02 - suma11 + suma20;
+            res[5] = dc - suma02 - suma11 - suma20;
 
             return res;
         }
