@@ -48,15 +48,11 @@ namespace LibPixz
             return blTrns;
         }
 
-        protected internal static float[,] Transpose(float[,] bloque, int tamX, int tamY)
+        protected internal static void Transpose(float[,] bloque, float[,] blTrns, int tamX, int tamY)
         {
-            float[,] blTrns = new float[tamX, tamY];
-
             for (int y = 0; y < tamY; y++)
                 for (int x = 0; x < tamX; x++)
                     blTrns[x, y] = bloque[y, x];
-
-            return blTrns;
         }
 
         protected internal static void PrintTable(Array array, int width, int height, int margin)

@@ -118,7 +118,7 @@ namespace LibPixz
                 }
             }
 
-            coefUY = Common.Transpose(coefYU, tamX, tamY);
+            Common.Transpose(coefYU, coefUY, tamX, tamY);
 
             // Ahora sacamos el DCT por columna de los resultados anteriores
             fixed (float* inicio = coefUY)
