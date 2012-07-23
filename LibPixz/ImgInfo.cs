@@ -31,5 +31,8 @@ namespace LibPixz
         public short restartMarker;
         public int mcuStrip = 0;
         public Pixz.Markers prevRestMarker = Pixz.Markers.Rs7;
+
+        // Constants
+        public const int blockSize = 8;
     }
 }

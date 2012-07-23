@@ -8,27 +8,13 @@ namespace LibPixz
 {
     unsafe internal partial class ImgOps
     {
-        internal static Dictionary<int, float[,]> tablasCos = new Dictionary<int, float[,]>()
-        {
-            { 1, GetTablaCos(1) },
-            { 2, GetTablaCos(2) },
-            { 4, GetTablaCos(4) },
-            { 8, GetTablaCos(8) },
-            { 16, GetTablaCos(16) },
-            { 32, GetTablaCos(32) },
-            { 64, GetTablaCos(64) },
-        };
+        const int blkSize = ImgInfo.blockSize;
 
-        internal static Dictionary<int, float[,]> tablasICos = new Dictionary<int, float[,]>()
-        {
-            { 1, GetTablaICos(1) },
-            { 2, GetTablaICos(2) },
-            { 4, GetTablaICos(4) },
-            { 8, GetTablaICos(8) },
-            { 16, GetTablaICos(16) },
-            { 32, GetTablaICos(32) },
-            { 64, GetTablaICos(64) },
-        };
+        static float[,] coefYU = new float[blkSize, blkSize];
+        static float[,] coefUY = new float[blkSize, blkSize];
+        static float[,] coefUV = new float[blkSize, blkSize];
+        static float[,] tCosXU = GetTablaICos(ImgInfo.blockSize);
+        static float[,] tCosYV = GetTablaICos(ImgInfo.blockSize);
 
         /*static Dictionary<int, int> bitsPorNum = new Dictionary<int, int>()
         {
@@ -46,23 +32,6 @@ namespace LibPixz
                                     6
                                   };
 
-        protected static float[,] GetTablaCos(int tam)
-        {
-            float[,] tablaCosXU = new float[tam, tam];
-
-            for (int u = 0; u < tam; u++)
-            {
-                for (int x = 0; x < tam; x++)
-                {
-                    tablaCosXU[x, u] = (float)Math.Cos(((2 * x + 1) * u * Math.PI) / (2 * tam));
-                    tablaCosXU[x, u] *= (float)Math.Sqrt(2.0 / tam);
-                    if (u == 0) tablaCosXU[x, u] /= (float)Math.Sqrt(2f);
-                }
-            }
-
-            return tablaCosXU;
-        }
-
         protected static float[,] GetTablaICos(int tam)
         {
             float[,] tablaCosUX = new float[tam, tam];
@@ -78,111 +47,6 @@ namespace LibPixz
             }
 
             return tablaCosUX;
-        }
-
-        static float[] Fct(float* bloque, int tam, float[,] tCos)
-        {
-            int numNiveles = bitsPorNum[tam];
-            float[] coefImpar = new float[tam];
-            float[] coefPar = new float[tam];
-            float[] res = new float[tam];
-
-            for (int i = 0; i < tam; i++)
-                coefPar[i] = bloque[i];
-
-            int tamAct = tam;
-
-            // Se calculan los coeficientes AC, basándose en qué nivel pertenecen
-            // Se crean niveles, estos dependen de qué cuánta factorización es posible para cada coeficiente
-            // mientras más alto el nivel, más pixeles se pueden agrupar, y así reducir el no. de operaciones
-            for (int nivel = 0; nivel <= numNiveles; nivel++)
-            {
-                int iu = 1 << nivel;
-                int step = iu << 1;
-                int hTam = tamAct / 2;
-
-                for (int i = 0; i < hTam; i++)
-                {
-                    Common.Butterfly(coefPar[i], coefPar[tamAct - i - 1], ref coefPar[i], ref coefImpar[i]);
-                }
-
-                for (int u = iu; u < tam; u += step)
-                {
-                    for (int x = 0; x < hTam; x++)
-                    {
-                        res[u] += coefImpar[x] * tCos[x, u];
-                    }
-                }
-
-                tamAct /= 2;
-            }
-
-            // Si es DC, entonces es el último nivel, y nunca se presenta simetría impar,
-            // así que el obtenemos el único valor de ese nivel
-            res[0] = coefPar[0] * tCos[0, 0];
-
-            return res;
-        }
-
-        static float[] Ifct(float* bloque, int tam, float[,] tIcos)
-        {
-            int numNiveles = bitsPorNum[tam];
-            float[] res = new float[tam];
-
-            //int tamAct = tam;
-
-            // Se calculan los coeficientes AC, basándose en qué nivel pertenecen
-            // Se crean niveles, estos dependen de qué cuánta factorización es posible para cada coeficiente
-            // mientras más alto el nivel, más pixeles se pueden agrupar, y así reducir el no. de operaciones
-            for (int nivel = 0; nivel <= numNiveles; nivel++)
-            {
-                int iu = 1 << nivel;
-                int step = iu << 1;
-                int tamAct = tam >> nivel;
-
-                for (int x = 0; x < tamAct / 2; x++)
-                {
-                    float suma = 0;
-                    //Console.WriteLine("float suma{0}{1} = 0;", x, nivel);
-
-                    for (int u = iu; u < tam; u += step)
-                    {
-                        suma += bloque[u] * tIcos[u, x];
-                        //Console.WriteLine("suma{0}{1} += bloque[{2}] * tIcos[{2}, {0}];", x, nivel, u);
-                    }
-                    //Console.WriteLine();
-
-                    for (int i = 0; i < iu; i += 2)
-                    {
-                        res[i * tamAct + x] += suma;
-                        //Console.WriteLine("res[{0}] += suma{1}{2};", i * tamAct + x, x, nivel);
-                        res[i * tamAct + tamAct - x - 1] -= suma;
-                        //Console.WriteLine("res[{0}] -= suma{1}{2};", i * tamAct + tamAct - x - 1, x, nivel);
-                    }
-                    //Console.WriteLine();
-
-                    for (int i = 1; i < iu; i += 2)
-                    {
-                        res[i * tamAct + x] -= suma;
-                        //Console.WriteLine("res[{0}] -= suma{1}{2};", i * tamAct + x, x, nivel);
-                        res[i * tamAct + tamAct - x - 1] += suma;
-                        //Console.WriteLine("res[{0}] += suma{1}{2};", i * tamAct + tamAct - x - 1, x, nivel);
-                    }
-                    //Console.WriteLine();
-                }
-            }
-
-            float dc = bloque[0] * tIcos[0, 0];
-            //Console.WriteLine("float dc = bloque[0] * tIcos[0, 0];");
-
-            for (int x = 0; x < tam; x++)
-            {
-                //Console.WriteLine("res[{0}] += dc;", x);
-                res[x] += dc;
-            }
-            //Console.WriteLine();
-
-            return res;
         }
 
         static void Ifct8(float* bloque, float* res, float[,] tIcos)
@@ -241,57 +105,9 @@ namespace LibPixz
             res[2] = p13 + suma20;
             res[5] = p13 - suma20;
         }
-        
-
-        protected internal static void Fdct(float[,] bloque, float[,] bloqueDct, int tamX, int tamY)
-        {
-            float[][] coefYU = new float[tamY][];
-            float[,] coefUY = new float[tamX, tamY];
-            float[][] coefUV = new float[tamY][];
-
-            float[,] tCosXU = tablasCos[tamX];
-            float[,] tCosYV = tablasCos[tamY];
-
-            // Sacamos el DCT de cada fila del bloque
-            fixed (float* inicio = bloque)
-            {
-                float* renglon = inicio;
-                //Parallel.For(0, tamY, y =>
-                for (int y = 0; y < tamY; y++)
-                {
-                    coefYU[y] = Fct(y * tamX + renglon, tamX, tCosXU);
-                }//);
-            }
-
-            coefUY = Common.Transpose(coefYU, tamX, tamY);
-
-            // Ahora sacamos el DCT por columna de los resultados anteriores
-            fixed (float* inicio = coefUY)
-            {
-                float* columna = inicio;
-                for (int u = 0; u < tamX; u++)
-                //Parallel.For(0, tamX, u =>
-                {
-                    coefUV[u] = Fct(u * tamY + columna, tamY, tCosYV);
-                }//);
-            }
-
-            for (int v = 0; v < tamY; v++)
-                for (int u = 0; u < tamX; u++)
-                    bloqueDct[v, u] = (float)Math.Round(coefUV[u][v]);
-
-            //return bloqueDct;
-        }
 
         protected internal static void Fidct(float[,] bloque, float[,] bloqueDct, int tamX, int tamY)
         {
-            float[,] coefYU = new float[tamY, tamX];
-            float[,] coefUY = new float[tamX, tamY];
-            float[,] coefUV = new float[tamX, tamY];
-
-            float[,] tCosXU = tablasICos[tamX];
-            float[,] tCosYV = tablasICos[tamY];
-
             // Sacamos el IDCT de cada fila del bloque
             fixed (float* inicio = bloque)
             fixed (float* inicioSalida = coefYU)
@@ -325,34 +141,6 @@ namespace LibPixz
             for (int v = 0; v < tamY; v++)
                 for (int u = 0; u < tamX; u++)
                     bloqueDct[v, u] = (float)Math.Round(coefUV[u, v]);
-
-            //return bloqueDct;
-        }
-
-        protected internal static void Dct(float[,] bloque, float[,] bloqueDct, int tamX, int tamY)
-        {
-            int u, v, x, y;
-            float suma, suma2;
-
-            float[,] tCosXU = tablasCos[tamX];
-            float[,] tCosYV = tablasCos[tamY];
-
-            for (v = 0; v < tamY; v++)
-            {
-                for (u = 0; u < tamX; u++)
-                {
-                    for (y = 0, suma2 = 0; y < tamY; y++)
-                    {
-                        for (x = 0, suma = 0; x < tamX; x++)
-                        {
-                            suma += (bloque[y, x]) * tCosXU[x, u];
-                        }
-
-                        suma2 += suma * tCosYV[y, v];
-                    }
-                    bloqueDct[v, u] = (float)(Math.Round(suma2));
-                }
-            }
         }
 
         protected internal static void Idct(float[,] bloque, float[,] bloqueDct, int tamX, int tamY)
@@ -360,9 +148,6 @@ namespace LibPixz
             int u, v, x, y;
             float suma, suma2;
 
-            float[,] tCosXU = tablasICos[tamX];
-            float[,] tCosYV = tablasICos[tamY];
-
             for (v = 0; v < tamY; v++)
             {
                 for (u = 0; u < tamX; u++)
@@ -379,35 +164,6 @@ namespace LibPixz
                     bloqueDct[v, u] = (float)(Math.Round(suma2));
                 }
             }
-        }
-
-        protected internal static float[,] DctP(float[,] bloque, int tamX, int tamY, bool inversa = false)
-        {
-            float[,] bloqueDct = new float[tamY, tamX];
-
-            float[,] tCosXU = inversa ? tablasICos[tamX] : tablasCos[tamX];
-            float[,] tCosYV = inversa ? tablasICos[tamY] : tablasCos[tamY];
-
-            Parallel.For(0, tamY, v =>
-            {
-                for (int u = 0; u < tamX; u++)
-                {
-                    float suma2 = 0;
-                    for (int y = 0; y < tamY; y++)
-                    {
-                        float suma = 0;
-                        for (int x = 0; x < tamX; x++)
-                        {
-                            suma += bloque[y, x] * tCosXU[x, u];
-                        }
-
-                        suma2 += suma * tCosYV[y, v];
-                    }
-                    bloqueDct[v, u] = (float)(Math.Round(suma2));
-                }
-            });
-
-            return bloqueDct;
         }
 
         protected internal static void MostrarBordes(float[,] coefDct, int tam)

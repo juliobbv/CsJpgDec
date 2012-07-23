@@ -9,7 +9,7 @@ namespace LibPixz
 {
     internal class ImageDecoder
     {
-        const int blkSize = 8; // JPEG decoding block size is 8x8
+        const int blkSize = ImgInfo.blockSize; // JPEG decoding block size is 8x8
 
         // Arrays used in different parts of the decoding process
         protected static float[,] blockP = new float[blkSize, blkSize];
