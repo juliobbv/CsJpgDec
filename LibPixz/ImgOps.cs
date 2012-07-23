@@ -185,10 +185,8 @@ namespace LibPixz
             return res;
         }
 
-        static float[] Ifct8(float* bloque, int tam, float[,] tIcos)
+        static void Ifct8(float* bloque, float[] res, float[,] tIcos)
         {
-            float[] res = new float[tam];
-
             float dc = bloque[0] * tIcos[0, 0];
 
             float suma02 = 0;
@@ -226,16 +224,22 @@ namespace LibPixz
             suma30 += bloque[5] * tIcos[5, 3];
             suma30 += bloque[7] * tIcos[7, 3];
 
-            res[0] = dc + suma02 + suma01 + suma00;
-            res[7] = dc + suma02 + suma01 - suma00;
-            res[3] = dc + suma02 - suma01 + suma30;
-            res[4] = dc + suma02 - suma01 - suma30;
-            res[1] = dc - suma02 + suma11 + suma10;
-            res[6] = dc - suma02 + suma11 - suma10;
-            res[2] = dc - suma02 - suma11 + suma20;
-            res[5] = dc - suma02 - suma11 - suma20;
+            float p00 = dc + suma02;
+            float p01 = dc - suma02;
 
-            return res;
+            float p10 = p00 + suma01;
+            float p11 = p00 - suma01;
+            float p12 = p01 + suma11;
+            float p13 = p01 - suma11;
+
+            res[0] = p10 + suma00;
+            res[7] = p10 - suma00;
+            res[3] = p11 + suma30;
+            res[4] = p11 - suma30;
+            res[1] = p12 + suma10;
+            res[6] = p12 - suma10;
+            res[2] = p13 + suma20;
+            res[5] = p13 - suma20;
         }
         
 
@@ -308,7 +312,7 @@ namespace LibPixz
                 for (int u = 0; u < tamX; u++)
                 //Parallel.For(0, tamX, u =>
                 {
-                    coefUV[u] = Ifct(u * tamY + columna, tamY, tCosYV);
+                    coefUV[u] = Ifct8(u * tamY + columna, tamY, tCosYV);
                 }//);
             }
 
