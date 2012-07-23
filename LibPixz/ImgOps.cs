@@ -143,37 +143,104 @@ namespace LibPixz
                 for (int x = 0; x < tamAct / 2; x++)
                 {
                     float suma = 0;
+                    //Console.WriteLine("float suma{0}{1} = 0;", x, nivel);
 
                     for (int u = iu; u < tam; u += step)
                     {
                         suma += bloque[u] * tIcos[u, x];
+                        //Console.WriteLine("suma{0}{1} += bloque[{2}] * tIcos[{2}, {0}];", x, nivel, u);
                     }
+                    //Console.WriteLine();
 
                     for (int i = 0; i < iu; i += 2)
                     {
                         res[i * tamAct + x] += suma;
+                        //Console.WriteLine("res[{0}] += suma{1}{2};", i * tamAct + x, x, nivel);
                         res[i * tamAct + tamAct - x - 1] -= suma;
+                        //Console.WriteLine("res[{0}] -= suma{1}{2};", i * tamAct + tamAct - x - 1, x, nivel);
                     }
+                    //Console.WriteLine();
 
                     for (int i = 1; i < iu; i += 2)
                     {
                         res[i * tamAct + x] -= suma;
+                        //Console.WriteLine("res[{0}] -= suma{1}{2};", i * tamAct + x, x, nivel);
                         res[i * tamAct + tamAct - x - 1] += suma;
+                        //Console.WriteLine("res[{0}] += suma{1}{2};", i * tamAct + tamAct - x - 1, x, nivel);
                     }
+                    //Console.WriteLine();
                 }
             }
 
+            float dc = bloque[0] * tIcos[0, 0];
+            //Console.WriteLine("float dc = bloque[0] * tIcos[0, 0];");
+
             for (int x = 0; x < tam; x++)
             {
-                res[x] += bloque[0] * tIcos[0, 0];
+                //Console.WriteLine("res[{0}] += dc;", x);
+                res[x] += dc;
             }
+            //Console.WriteLine();
 
             return res;
         }
 
+        static float[] Ifct8(float* bloque, int tam, float[,] tIcos)
+        {
+            float[] res = new float[tam];
+
+            float dc = bloque[0] * tIcos[0, 0];
+
+            float suma02 = 0;
+            suma02 += bloque[4] * tIcos[4, 0];
+
+            float suma01 = 0;
+            suma01 += bloque[2] * tIcos[2, 0];
+            suma01 += bloque[6] * tIcos[6, 0];
+
+            float suma11 = 0;
+            suma11 += bloque[2] * tIcos[2, 1];
+            suma11 += bloque[6] * tIcos[6, 1];
+
+            float suma00 = 0;
+            suma00 += bloque[1] * tIcos[1, 0];
+            suma00 += bloque[3] * tIcos[3, 0];
+            suma00 += bloque[5] * tIcos[5, 0];
+            suma00 += bloque[7] * tIcos[7, 0];
+
+            float suma10 = 0;
+            suma10 += bloque[1] * tIcos[1, 1];
+            suma10 += bloque[3] * tIcos[3, 1];
+            suma10 += bloque[5] * tIcos[5, 1];
+            suma10 += bloque[7] * tIcos[7, 1];
+
+            float suma20 = 0;
+            suma20 += bloque[1] * tIcos[1, 2];
+            suma20 += bloque[3] * tIcos[3, 2];
+            suma20 += bloque[5] * tIcos[5, 2];
+            suma20 += bloque[7] * tIcos[7, 2];
+
+            float suma30 = 0;
+            suma30 += bloque[1] * tIcos[1, 3];
+            suma30 += bloque[3] * tIcos[3, 3];
+            suma30 += bloque[5] * tIcos[5, 3];
+            suma30 += bloque[7] * tIcos[7, 3];
+
+            res[0] = dc + suma00 + suma01 + suma02;
+            res[1] = dc + suma10 + suma11 - suma02;
+            res[2] = dc + suma20 - suma11 - suma02;
+            res[3] = dc + suma30 - suma01 + suma02;
+            res[4] = dc - suma30 - suma01 + suma02;
+            res[5] = dc - suma20 - suma11 - suma02;
+            res[6] = dc - suma10 + suma11 - suma02;
+            res[7] = dc - suma00 + suma01 + suma02;
+
+            return res;
+        }
+        
+
         protected internal static void Fdct(float[,] bloque, float[,] bloqueDct, int tamX, int tamY)
         {
-            //float[,] bloqueDct = new float[tamY, tamX];
             float[][] coefYU = new float[tamY][];
             float[,] coefUY = new float[tamX, tamY];
             float[][] coefUV = new float[tamY][];
@@ -214,7 +281,6 @@ namespace LibPixz
 
         protected internal static void Fidct(float[,] bloque, float[,] bloqueDct, int tamX, int tamY)
         {
-            //float[,] bloqueDct = new float[tamY, tamX];
             float[][] coefYU = new float[tamY][];
             float[,] coefUY = new float[tamX, tamY];
             float[][] coefUV = new float[tamY][];
@@ -229,7 +295,7 @@ namespace LibPixz
                 //Parallel.For(0, tamY, y =>
                 for (int y = 0; y < tamY; y++)
                 {
-                    coefYU[y] = Ifct(y * tamX + renglon, tamX, tCosXU);
+                    coefYU[y] = Ifct8(y * tamX + renglon, tamX, tCosXU);
                 }//);
             }
 

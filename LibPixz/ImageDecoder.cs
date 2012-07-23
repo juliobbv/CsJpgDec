@@ -198,7 +198,6 @@ namespace LibPixz
             short[] coefZig = GetCoefficients(bReader, imgInfo, compIndex, blkSize * blkSize);
             FileOps.ZigZagToArray(coefZig, coefDctQnt, FileOps.tablasZigzag[blkSize], blkSize);
             ImgOps.Dequant(coefDctQnt, coefDct, imgInfo.quantTables[quantIndex].table, blkSize);
-            //ImgOps.Idct(coefDct, blockP, blkSize, blkSize);
             ImgOps.Fidct(coefDct, blockP, blkSize, blkSize);
 
             ImgOps.ResizeAndInsertBlock(imgInfo, blockP, img, blkSize, blkSize, ofsX, ofsY, scaleX, scaleY);
