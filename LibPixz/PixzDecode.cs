@@ -57,6 +57,7 @@ namespace LibPixz
                         switch ((Markers)markerId)
                         {
                             case Markers.App0:
+                                App0.Read(reader, imgInfo);
                                 break;
                             case Markers.App14:
                                 App14.Read(reader, imgInfo);

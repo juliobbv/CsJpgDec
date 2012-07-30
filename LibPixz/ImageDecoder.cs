@@ -58,13 +58,15 @@ namespace LibPixz
 
                     for (int ch = 0; ch < imgInfo.numOfComponents; ch++)
                     {
+                        int scaleX = componentMax.samplingFactorX / imgInfo.components[ch].samplingFactorX;
+                        int scaleY = componentMax.samplingFactorY / imgInfo.components[ch].samplingFactorY;
+
                         for (int sy = 0; sy < imgInfo.components[ch].samplingFactorY; sy++)
                         {
                             for (int sx = 0; sx < imgInfo.components[ch].samplingFactorX; sx++)
                             {
                                 DecodeBlock(bReader, imgInfo, img[ch], ch, ofsX + blkSize * sx, ofsY + blkSize * sy,
-                                    componentMax.samplingFactorX / imgInfo.components[ch].samplingFactorX,
-                                    componentMax.samplingFactorY / imgInfo.components[ch].samplingFactorY);
+                                    scaleX, scaleY);
                             }
                         }
                     }
@@ -230,11 +232,11 @@ namespace LibPixz
 
                 run = runAmplitude >> 4;
                 amplitude = runAmplitude & 0xf;
-                pos += run;
+                pos += run + 1;
 
-                if (pos >= 63) break;
+                if (pos >= blkSize * blkSize) break;
 
-                coefZig[++pos] = Huffman.ReadCoefValue(bReader, amplitude);
+                coefZig[pos] = Huffman.ReadCoefValue(bReader, amplitude);
             }
 
             return coefZig;

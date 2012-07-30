@@ -6,13 +6,18 @@ using System.Drawing;
 
 namespace LibPixz
 {
-    unsafe internal partial class ImgOps
+    internal partial class ImgOps
     {
         const int blkSize = ImgInfo.blockSize;
 
         static float[,] coefYU = new float[blkSize, blkSize];
         static float[,] coefUY = new float[blkSize, blkSize];
         static float[,] coefUV = new float[blkSize, blkSize];
+
+        static ArraySlice<float> coefYUS = new ArraySlice<float>(coefYU);
+        static ArraySlice<float> coefUYS = new ArraySlice<float>(coefUY);
+        static ArraySlice<float> coefUVS = new ArraySlice<float>(coefUV);
+
         static float[,] tCosXU = GetTablaICos(ImgInfo.blockSize);
         static float[,] tCosYV = GetTablaICos(ImgInfo.blockSize);
 
@@ -49,7 +54,7 @@ namespace LibPixz
             return tablaCosUX;
         }
 
-        static void Ifct8(float* bloque, float* res, float[,] tIcos)
+        static void Ifct8(ArraySlice<float> bloque, ArraySlice<float> res, float[,] tIcos)
         {
             float dc = bloque[0] * tIcos[0, 0];
 
@@ -108,26 +113,26 @@ namespace LibPixz
 
         protected internal static void Fidct(float[,] bloque, float[,] bloqueDct, int tamX, int tamY)
         {
+            var bloqueS = new ArraySlice<float>(bloque);
+
             // Sacamos el IDCT de cada fila del bloque
-            fixed (float* inicio = bloque)
-            fixed (float* inicioSalida = coefYU)
+            for (int y = 0; y < tamY; y++)
             {
-                for (int y = 0; y < tamY; y++)
-                {
-                    Ifct8(y * tamX + inicio, y * tamX + inicioSalida, tCosXU);
-                }
+                bloqueS.FirstDimension = y;
+                coefYUS.FirstDimension = y;
+
+                Ifct8(bloqueS, coefYUS, tCosXU);
             }
 
             Common.Transpose(coefYU, coefUY, tamX, tamY);
 
             // Ahora sacamos el DCT por columna de los resultados anteriores
-            fixed (float* inicio = coefUY)
-            fixed (float* inicioSalida = coefUV) 
+            for (int u = 0; u < tamX; u++)
             {
-                for (int u = 0; u < tamX; u++)
-                {
-                    Ifct8(u * tamY + inicio, u * tamY + inicioSalida, tCosYV);
-                }
+                coefUYS.FirstDimension = u;
+                coefUVS.FirstDimension = u;
+
+                Ifct8(coefUYS, coefUVS, tCosYV);
             }
 
             for (int v = 0; v < tamY; v++)
