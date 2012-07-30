@@ -228,6 +228,7 @@ namespace LibPixz
             {
                 runAmplitude = Huffman.ReadRunAmplitude(bReader, imgInfo.huffmanTables[1, acIndex]);
 
+                // 0x00 is End of Block
                 if (runAmplitude == 0x00) break;
 
                 run = runAmplitude >> 4;

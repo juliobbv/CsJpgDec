@@ -18,7 +18,7 @@ namespace LibPixz
             App0 = 0xe0,
             App14 = 0xee,
             Dqt = 0xdb,
-            Sof0 = 0xc0,
+            Sof0 = 0xc0, Sof2 = 0xc2,
             Dht = 0xc4,
             Rs0 = 0xd0, Rs1 = 0xd1, Rs2 = 0xd2, Rs3 = 0xd3,
             Rs4 = 0xd4, Rs5 = 0xd5, Rs6 = 0xd6, Rs7 = 0xd7,
@@ -30,6 +30,8 @@ namespace LibPixz
         public static List<Bitmap> Decode(string path)
         {
             MemoryStream stream = ReadFileToMemory(path);
+
+            Logger.WriteLine("Log for image: " + path);
 
             return Pixz.Decode(stream);
         }
@@ -67,6 +69,9 @@ namespace LibPixz
                                 break;
                             case Markers.Sof0:
                                 Sof0.Read(reader, imgInfo);
+                                break;
+                            case Markers.Sof2:
+                                Sof2.Read(reader, imgInfo);
                                 break;
                             case Markers.Dht:
                                 Dht.Read(reader, imgInfo);

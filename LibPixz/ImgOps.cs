@@ -118,10 +118,7 @@ namespace LibPixz
             // Sacamos el IDCT de cada fila del bloque
             for (int y = 0; y < tamY; y++)
             {
-                bloqueS.FirstDimension = y;
-                coefYUS.FirstDimension = y;
-
-                Ifct8(bloqueS, coefYUS, tCosXU);
+                Ifct8(bloqueS.GetSlice(y), coefYUS.GetSlice(y), tCosXU);
             }
 
             Common.Transpose(coefYU, coefUY, tamX, tamY);
@@ -129,10 +126,7 @@ namespace LibPixz
             // Ahora sacamos el DCT por columna de los resultados anteriores
             for (int u = 0; u < tamX; u++)
             {
-                coefUYS.FirstDimension = u;
-                coefUVS.FirstDimension = u;
-
-                Ifct8(coefUYS, coefUVS, tCosYV);
+                Ifct8(coefUYS.GetSlice(u), coefUVS.GetSlice(u), tCosYV);
             }
 
             for (int v = 0; v < tamY; v++)

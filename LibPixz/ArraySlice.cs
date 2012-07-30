@@ -26,5 +26,17 @@ namespace LibPixz
             get { return arr[firstDimension, index]; }
             set { arr[firstDimension, index] = value; }
         }
+        
+        /// <summary>
+        /// Returns a slice of a 2D array, specified at a index
+        /// Note: returned object is the same as input
+        /// </summary>
+        /// <param name="firstDimension">Index of the first dimension to slice</param>
+        /// <returns>Slice of the 2D array</returns>
+        public ArraySlice<T> GetSlice(int firstDimension)
+        {
+            this.firstDimension = firstDimension;
+            return this;
+        }
     }
 }

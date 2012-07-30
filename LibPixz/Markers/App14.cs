@@ -20,7 +20,7 @@ namespace LibPixz.Markers
         public static void Read(BinaryReader reader, ImgInfo imgInfo)
         {
             LogMarker(reader, name);
-            int markerLength = reader.ReadBEUInt16();
+            ushort markerLength = reader.ReadBEUInt16();
 
             reader.ReadBytes(11);
 
