@@ -23,30 +23,29 @@ namespace PixzGui
         {
             using (OpenFileDialog dialogo = new OpenFileDialog())
             {
+                dialogo.Filter = "JPEG Images (*.jpg; *.jpeg;)|*.jpg; *.jpeg; | All files (*.*)|*.*";
+
                 if (dialogo.ShowDialog() == DialogResult.OK)
                 {
                     Stopwatch watch = new Stopwatch();
 
-                    //if (Path.GetExtension(dialogo.FileName).ToLower() == ".jpg")
+                    watch.Start();
+                    images = Pixz.Decode(dialogo.FileName);
+                    watch.Stop();
+
+                    lblTiempo.Text = watch.ElapsedMilliseconds / 1000.0 + " s";
+
+                    if (images.Count == 0)
                     {
-                        watch.Start();
-                        images = Pixz.Decode(dialogo.FileName);
-                        watch.Stop();
-
-                        lblTiempo.Text = watch.ElapsedMilliseconds / 1000.0 + " s";
-
-                        if (images.Count == 0)
-                        {
-                            MessageBox.Show("No se encontraron imágenes en el archivo");
-                            return;
-                        }
-
-                        pbxOriginal.Image = images[0];
-
-                        nudImagen.Value = 0;
-                        nudImagen.Minimum = 0;
-                        nudImagen.Maximum = images.Count - 1;
+                        MessageBox.Show("No se encontraron imágenes en el archivo");
+                        return;
                     }
+
+                    pbxOriginal.Image = images[0];
+
+                    nudImagen.Value = 0;
+                    nudImagen.Minimum = 0;
+                    nudImagen.Maximum = images.Count - 1;
                 }
             }
         }
